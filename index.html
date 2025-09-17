@@ -11,46 +11,361 @@
     <meta name="theme-color" content="#4facfe">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="default">
-    <link rel="stylesheet" href="styles.css">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            line-height: 1.6;
+        }
+
+        .app-container {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            border-radius: 24px;
+            box-shadow: 
+                0 32px 64px rgba(0, 0, 0, 0.1),
+                0 0 0 1px rgba(255, 255, 255, 0.2);
+            width: 100%;
+            max-width: 800px;
+            overflow: hidden;
+        }
+
+        .header {
+            background: linear-gradient(135deg, #2563eb 0%, #7c3aed 100%);
+            color: white;
+            padding: 40px;
+            text-align: center;
+            position: relative;
+        }
+
+        .header::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            background: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cg fill='none' fill-rule='evenodd'%3E%3Cg fill='%23ffffff' fill-opacity='0.05'%3E%3Ccircle cx='30' cy='30' r='4'/%3E%3C/g%3E%3C/g%3E%3C/svg%3E") repeat;
+        }
+
+        .header-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .header h1 {
+            font-size: 2.5rem;
+            font-weight: 700;
+            margin-bottom: 12px;
+            letter-spacing: -0.02em;
+        }
+
+        .header p {
+            font-size: 1.125rem;
+            opacity: 0.9;
+            font-weight: 400;
+        }
+
+        .main-content {
+            padding: 48px;
+        }
+
+        .form-section {
+            margin-bottom: 40px;
+        }
+
+        .form-label {
+            display: block;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #374151;
+            margin-bottom: 12px;
+            letter-spacing: 0.025em;
+            text-transform: uppercase;
+        }
+
+        .text-input {
+            width: 100%;
+            min-height: 140px;
+            padding: 20px;
+            border: 2px solid #e5e7eb;
+            border-radius: 16px;
+            font-size: 16px;
+            line-height: 1.6;
+            resize: vertical;
+            transition: all 0.2s ease;
+            font-family: inherit;
+            background: #fafafa;
+        }
+
+        .text-input:focus {
+            outline: none;
+            border-color: #2563eb;
+            background: #ffffff;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .controls-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+
+        .control-group {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .control-label {
+            font-size: 0.875rem;
+            font-weight: 500;
+            color: #6b7280;
+            margin-bottom: 8px;
+        }
+
+        .select-input {
+            padding: 12px 16px;
+            border: 2px solid #e5e7eb;
+            border-radius: 12px;
+            font-size: 14px;
+            background: #ffffff;
+            color: #374151;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            appearance: none;
+            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+            background-position: right 12px center;
+            background-repeat: no-repeat;
+            background-size: 16px;
+            padding-right: 40px;
+        }
+
+        .select-input:focus {
+            outline: none;
+            border-color: #2563eb;
+            box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
+        }
+
+        .select-input option {
+            background-color: #ffffff;
+            color: #374151;
+            padding: 8px;
+        }
+
+        .range-container {
+            position: relative;
+        }
+
+        .range-input {
+            width: 100%;
+            height: 6px;
+            background: #e5e7eb;
+            border-radius: 3px;
+            outline: none;
+            cursor: pointer;
+            appearance: none;
+        }
+
+        .range-input::-webkit-slider-thumb {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            background: #2563eb;
+            border-radius: 50%;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+            transition: all 0.2s ease;
+        }
+
+        .range-input::-webkit-slider-thumb:hover {
+            transform: scale(1.1);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+        }
+
+        .range-input::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            background: #2563eb;
+            border-radius: 50%;
+            border: none;
+            cursor: pointer;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
+
+        .range-value {
+            display: block;
+            text-align: center;
+            font-size: 0.875rem;
+            font-weight: 600;
+            color: #2563eb;
+            margin-top: 8px;
+        }
+
+        .button-group {
+            display: flex;
+            gap: 16px;
+            justify-content: center;
+            flex-wrap: wrap;
+            margin-bottom: 32px;
+        }
+
+        .btn {
+            padding: 14px 28px;
+            border: none;
+            border-radius: 12px;
+            font-size: 15px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            min-width: 140px;
+            justify-content: center;
+            font-family: inherit;
+            letter-spacing: 0.025em;
+        }
+
+        .btn-primary {
+            background: linear-gradient(135deg, #2563eb 0%, #3b82f6 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(37, 99, 235, 0.3);
+        }
+
+        .btn-primary:hover:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 20px rgba(37, 99, 235, 0.4);
+        }
+
+        .btn-secondary {
+            background: linear-gradient(135deg, #f59e0b 0%, #f97316 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(245, 158, 11, 0.3);
+        }
+
+        .btn-secondary:hover:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 20px rgba(245, 158, 11, 0.4);
+        }
+
+        .btn-danger {
+            background: linear-gradient(135deg, #dc2626 0%, #ef4444 100%);
+            color: white;
+            box-shadow: 0 4px 12px rgba(220, 38, 38, 0.3);
+        }
+
+        .btn-danger:hover:not(:disabled) {
+            transform: translateY(-1px);
+            box-shadow: 0 8px 20px rgba(220, 38, 38, 0.4);
+        }
+
+        .btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+            transform: none !important;
+            box-shadow: none !important;
+        }
+
+        .status-panel {
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 16px;
+            padding: 20px;
+            text-align: center;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+
+        .status-panel.ready {
+            background: linear-gradient(135deg, #ecfdf5 0%, #f0fdf4 100%);
+            border-color: #bbf7d0;
+            color: #166534;
+        }
+
+        .status-panel.speaking {
+            background: linear-gradient(135deg, #eff6ff 0%, #f0f9ff 100%);
+            border-color: #93c5fd;
+            color: #1e40af;
+        }
+
+        .status-panel.error {
+            background: linear-gradient(135deg, #fef2f2 0%, #fefefe 100%);
+            border-color: #fecaca;
+            color: #dc2626;
+        }
+
+        .icon {
+            width: 16px;
+            height: 16px;
+            fill: currentColor;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 16px;
+            }
+
+            .header {
+                padding: 32px 24px;
+            }
+
+            .header h1 {
+                font-size: 2rem;
+            }
+
+            .main-content {
+                padding: 32px 24px;
+            }
+
+            .controls-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+
+            .button-group {
+                flex-direction: column;
+                align-items: stretch;
+            }
+
+            .btn {
+                width: 100%;
+            }
+        }
+    </style>
 </head>
 <body>
-    <main class="app-container" role="main">
-        <header class="header">
-            <h1 class="app-title">
-                <span aria-hidden="true">🎤</span>
-                Text-to-Speech PWA
-            </h1>
-        </header>
-
+    <div class="app-container">
+        <div class="header">
+            <div class="header-content">
+                <h1>Text to Speech</h1>
+                <p>高品質な音声でテキストを読み上げ</p>
+            </div>
+        </div>
+        
         <div class="main-content">
-            <section class="text-input-section">
-                <label for="textInput" class="input-label">テキスト入力 (最大10,000文字)</label>
-                <textarea
-                    id="textInput"
-                    class="text-input"
-                    placeholder="ここにテキストを入力してください&#10;例: Hello, world! こんにちは世界！"
-                    maxlength="10000"
-                    rows="6"
-                    aria-describedby="charCount"
+            <div class="form-section">
+                <label class="form-label" for="textInput">読み上げテキスト</label>
+                <textarea 
+                    id="textInput" 
+                    class="text-input" 
+                    placeholder="ここに読み上げたいテキストを入力してください...&#10;&#10;English text is also supported.&#10;日本語のテキストにも対応しています。"
                 ></textarea>
-                <div class="char-count" id="charCount">0 / 10,000</div>
-            </section>
-
-            <section class="language-section">
-                <div class="language-controls">
-                    <label for="languageSelect" class="control-label">言語選択</label>
-                    <select id="languageSelect" class="language-select" aria-label="読み上げ言語を選択">
-                        <option value="auto">自動判定</option>
-                        <option value="ja-JP">日本語</option>
-                        <option value="en-US">英語 (米国)</option>
-                        <option value="en-GB">英語 (英国)</option>
-                    </select>
-                </div>
-                <div class="detected-language" id="detectedLanguage" aria-live="polite"></div>
-            </section>
-
-            <section class="voice-controls">
-                <div class="voice-grid">
+            </div>
+            
+                            <div class="voice-grid">
                     <div class="control-group">
                         <label for="voiceSelect" class="control-label">音声選択</label>
                         <select id="voiceSelect" class="voice-select" aria-label="音声を選択">
@@ -59,91 +374,270 @@
                     </div>
 
                     <div class="control-group">
-                        <label for="genderSelect" class="control-label">性別フィルター</label>
-                        <select id="genderSelect" class="gender-select" aria-label="音声の性別でフィルター">
-                            <option value="all">すべて表示</option>
-                            <option value="female">👩 女性音声</option>
-                            <option value="male">👨 男性音声</option>
-                            <option value="unknown">🔊 その他</option>
-                        </select>
-                    </div>
-
-                    <div class="control-group">
-                        <label for="rateSlider" class="control-label">
-                            速度: <span id="rateValue">1.0</span>倍
+                        <label for="rateRange" class="control-label">
+                            読み上げ速度: <span id="rateValue" class="range-value">1.0x</span>
                         </label>
-                        <input
-                            type="range"
-                            id="rateSlider"
-                            class="slider"
-                            min="0.1"
-                            max="2.0"
-                            step="0.1"
-                            value="1.0"
-                            aria-label="読み上げ速度"
-                        >
-                    </div>
-
-                    <div class="control-group">
-                        <label for="pitchSlider" class="control-label">
-                            ピッチ: <span id="pitchValue">1.0</span>
-                        </label>
-                        <input
-                            type="range"
-                            id="pitchSlider"
-                            class="slider"
-                            min="0.1"
-                            max="2.0"
-                            step="0.1"
-                            value="1.0"
-                            aria-label="音声ピッチ"
-                        >
-                    </div>
-
-                    <div class="control-group">
-                        <label for="volumeSlider" class="control-label">
-                            音量: <span id="volumeValue">100</span>%
-                        </label>
-                        <input
-                            type="range"
-                            id="volumeSlider"
-                            class="slider"
-                            min="0"
-                            max="100"
-                            step="10"
-                            value="100"
-                            aria-label="音量"
-                        >
+                        <div class="range-container">
+                            <input type="range" id="rateRange" class="range-input" min="0.1" max="2" step="0.1" value="1">
+                        </div>
                     </div>
                 </div>
-            </section>
-
-            <section class="playback-controls">
-                <div class="button-group">
-                    <button id="playBtn" class="control-btn primary" aria-label="読み上げ開始">
-                        <span class="btn-icon">▶️</span>
-                        <span class="btn-text">再生</span>
-                    </button>
-                    <button id="pauseBtn" class="control-btn pause" aria-label="一時停止" disabled>
-                        <span class="btn-icon">⏸️</span>
-                        <span class="btn-text">一時停止</span>
-                    </button>
-                    <button id="stopBtn" class="control-btn stop" aria-label="停止" disabled>
-                        <span class="btn-icon">⏹️</span>
-                        <span class="btn-text">停止</span>
-                    </button>
-                </div>
-            </section>
-
-            <section class="visualizer-section">
-                <div class="visualizer-container">
-                    <canvas id="visualizer" class="visualizer" width="400" height="100" aria-label="音声波形表示"></canvas>
-                    <div class="status-display" id="statusDisplay" aria-live="polite">準備完了</div>
-                </div>
-            </section>
+            
+            <div class="button-group">
+                <button id="speakBtn" class="btn-modern btn-play">
+                    <div class="btn-icon-container">
+                        <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M8 5v14l11-7z"/>
+                        </svg>
+                    </div>
+                    <span class="btn-text">再生</span>
+                </button>
+                
+                <button id="pauseBtn" class="btn-modern btn-pause" disabled>
+                    <div class="btn-icon-container">
+                        <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor">
+                            <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z"/>
+                        </svg>
+                    </div>
+                    <span class="btn-text">一時停止</span>
+                </button>
+                
+                <button id="stopBtn" class="btn-modern btn-stop" disabled>
+                    <div class="btn-icon-container">
+                        <svg class="btn-icon" viewBox="0 0 24 24" fill="currentColor">
+                            <rect x="6" y="6" width="12" height="12"/>
+                        </svg>
+                    </div>
+                    <span class="btn-text">停止</span>
+                </button>
+            </div>
+            
+            <div id="status" class="status-panel ready">
+                準備完了 - テキストを入力して読み上げを開始してください
+            </div>
         </div>
-    </main>
+    </div>
 
-    <script src="app.js"></script>
+    <script>
+        class TextToSpeechApp {
+            constructor() {
+                this.synth = window.speechSynthesis;
+                this.currentUtterance = null;
+                this.isPaused = false;
+                
+                this.initializeElements();
+                this.loadVoices();
+                this.bindEvents();
+                this.checkBrowserSupport();
+            }
+            
+            initializeElements() {
+                this.textInput = document.getElementById('textInput');
+                this.languageSelect = document.getElementById('languageSelect');
+                this.voiceSelect = document.getElementById('voiceSelect');
+                this.rateRange = document.getElementById('rateRange');
+                this.volumeRange = document.getElementById('volumeRange');
+                this.rateValue = document.getElementById('rateValue');
+                this.volumeValue = document.getElementById('volumeValue');
+                this.speakBtn = document.getElementById('speakBtn');
+                this.pauseBtn = document.getElementById('pauseBtn');
+                this.stopBtn = document.getElementById('stopBtn');
+                this.status = document.getElementById('status');
+            }
+            
+            bindEvents() {
+                this.speakBtn.addEventListener('click', () => this.speak());
+                this.pauseBtn.addEventListener('click', () => this.pause());
+                this.stopBtn.addEventListener('click', () => this.stop());
+                
+                this.rateRange.addEventListener('input', (e) => {
+                    this.rateValue.textContent = `${parseFloat(e.target.value).toFixed(1)}x`;
+                });
+                
+                this.languageSelect.addEventListener('change', () => {
+                    this.loadVoices();
+                });
+                
+                if (this.synth.onvoiceschanged !== undefined) {
+                    this.synth.onvoiceschanged = () => this.loadVoices();
+                }
+            }
+            
+            checkBrowserSupport() {
+                if (!('speechSynthesis' in window)) {
+                    this.updateStatus('error', 'お使いのブラウザは音声合成をサポートしていません');
+                    this.speakBtn.disabled = true;
+                }
+            }
+            
+            loadVoices() {
+                const voices = this.synth.getVoices();
+                const selectedLang = this.languageSelect.value;
+                
+                this.voiceSelect.innerHTML = '<option value="">デフォルト</option>';
+                
+                let filteredVoices = voices;
+                if (selectedLang !== 'auto') {
+                    const langCode = selectedLang.split('-')[0];
+                    filteredVoices = voices.filter(voice => voice.lang.startsWith(langCode));
+                }
+                
+                // 高品質音声を優先してソート
+                filteredVoices.sort((a, b) => {
+                    if (a.localService !== b.localService) {
+                        return a.localService ? -1 : 1;
+                    }
+                    return a.name.localeCompare(b.name);
+                });
+                
+                filteredVoices.forEach((voice) => {
+                    const option = document.createElement('option');
+                    option.value = voice.name;
+                    
+                    // 音声名を分類して表示
+                    let displayName = voice.name;
+                    if (voice.lang.includes('ja')) {
+                        displayName = `${voice.name} (日本語)`;
+                    } else if (voice.lang.includes('en')) {
+                        displayName = `${voice.name} (英語)`;
+                    }
+                    
+                    option.textContent = displayName;
+                    this.voiceSelect.appendChild(option);
+                });
+            }
+            
+            detectLanguage(text) {
+                const japanesePattern = /[\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF]/;
+                return japanesePattern.test(text) ? 'ja-JP' : 'en-US';
+            }
+            
+            speak() {
+                const text = this.textInput.value.trim();
+                
+                if (!text) {
+                    this.updateStatus('error', 'テキストを入力してください');
+                    return;
+                }
+                
+                // アイコンや記号を除去
+                const cleanText = this.cleanTextForSpeech(text);
+                
+                this.synth.cancel();
+                
+                this.currentUtterance = new SpeechSynthesisUtterance(cleanText);
+                
+                let selectedLang = this.languageSelect.value;
+                if (selectedLang === 'auto') {
+                    selectedLang = this.detectLanguage(text);
+                }
+                this.currentUtterance.lang = selectedLang;
+                
+                // 選択された音声を設定
+                const voices = this.synth.getVoices();
+                const selectedVoiceName = this.voiceSelect.value;
+                if (selectedVoiceName) {
+                    const selectedVoice = voices.find(voice => voice.name === selectedVoiceName);
+                    if (selectedVoice) {
+                        this.currentUtterance.voice = selectedVoice;
+                    }
+                }
+                
+                this.currentUtterance.rate = parseFloat(this.rateRange.value);
+                this.currentUtterance.volume = 1; // 固定値（システム音量に依存）
+                this.currentUtterance.pitch = 1;
+                
+                this.currentUtterance.onstart = () => {
+                    this.updateStatus('speaking', '読み上げ中...');
+                    this.speakBtn.disabled = true;
+                    this.pauseBtn.disabled = false;
+                    this.stopBtn.disabled = false;
+                };
+                
+                this.currentUtterance.onend = () => {
+                    this.updateStatus('ready', '読み上げ完了');
+                    this.resetButtons();
+                };
+                
+                this.currentUtterance.onerror = (event) => {
+                    this.updateStatus('error', `エラーが発生しました: ${event.error}`);
+                    this.resetButtons();
+                };
+                
+                this.synth.speak(this.currentUtterance);
+                this.isPaused = false;
+            }
+            
+            cleanTextForSpeech(text) {
+                // 絵文字、記号、特殊文字を除去または置換
+                return text
+                    .replace(/[📱💻🖥️📊📈📉🎯🚀✅❌⚠️🔍📝💡🎨🎵🔊🔇]/g, '') // 絵文字を除去
+                    .replace(/[•·]/g, '') // 箇条書き記号を除去
+                    .replace(/\s+/g, ' ') // 複数の空白を単一の空白に
+                    .trim();
+            }
+            
+            pause() {
+                if (this.synth.speaking && !this.synth.paused) {
+                    this.synth.pause();
+                    this.isPaused = true;
+                    this.pauseBtn.innerHTML = `
+                        <svg class="icon" viewBox="0 0 24 24">
+                            <path d="M8,5.14V19.14L19,12.14L8,5.14Z" />
+                        </svg>
+                        再開
+                    `;
+                    this.updateStatus('ready', '一時停止中 - 再開ボタンで続きから再生');
+                } else if (this.synth.paused) {
+                    this.synth.resume();
+                    this.isPaused = false;
+                    this.pauseBtn.innerHTML = `
+                        <svg class="icon" viewBox="0 0 24 24">
+                            <path d="M14,19H18V5H14M6,19H10V5H6V19Z" />
+                        </svg>
+                        一時停止
+                    `;
+                    this.updateStatus('speaking', '読み上げ中...');
+                }
+            }
+            
+            stop() {
+                this.synth.cancel();
+                this.updateStatus('ready', '読み上げを停止しました');
+                this.resetButtons();
+            }
+            
+            resetButtons() {
+                this.speakBtn.disabled = false;
+                this.pauseBtn.disabled = true;
+                this.stopBtn.disabled = true;
+                this.pauseBtn.innerHTML = `
+                    <svg class="icon" viewBox="0 0 24 24">
+                        <path d="M14,19H18V5H14M6,19H10V5H6V19Z" />
+                    </svg>
+                    一時停止
+                `;
+                this.isPaused = false;
+            }
+            
+            updateStatus(type, message) {
+                this.status.className = `status-panel ${type}`;
+                this.status.textContent = message;
+            }
+        }
+        
+        document.addEventListener('DOMContentLoaded', () => {
+            // Web Speech API対応チェック
+            if (!('speechSynthesis' in window)) {
+                alert('お使いのブラウザはWeb Speech APIをサポートしていません。\\n対応ブラウザ（Chrome、Firefox、Safari、Edge）をご利用ください。');
+                return;
+            }
+            
+            // アプリケーション開始
+            new TextToSpeechApp();
+            
+            console.log('Text-to-Speech PWA initialized successfully');
+        });
+    </script>
 </body>
 </html>
