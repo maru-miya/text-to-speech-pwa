@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Text-to-Speech PWA</title>
+    <meta name="description" content="英語・日本語対応 高品質テキスト読み上げPWAアプリケーション">
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/svg+xml" sizes="192x192" href="icons/icon-192.svg">
+    <link rel="apple-touch-icon" href="icons/icon-192.svg">
+    <meta name="theme-color" content="#4facfe">
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="default">
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <main class="app-container" role="main">
+        <header class="header">
+            <h1 class="app-title">
+                <span aria-hidden="true">🎤</span>
+                Text-to-Speech PWA
+            </h1>
+            <button class="theme-toggle" aria-label="ダークモード切り替え" title="テーマを切り替え">
+                <span class="theme-icon">🌙</span>
+            </button>
+        </header>
+
+        <div class="main-content">
+            <section class="text-input-section">
+                <label for="textInput" class="input-label">テキスト入力 (最大10,000文字)</label>
+                <textarea
+                    id="textInput"
+                    class="text-input"
+                    placeholder="ここにテキストを入力してください&#10;例: Hello, world! こんにちは世界！"
+                    maxlength="10000"
+                    rows="6"
+                    aria-describedby="charCount"
+                ></textarea>
+                <div class="char-count" id="charCount">0 / 10,000</div>
+            </section>
+
+            <section class="language-section">
+                <div class="language-controls">
+                    <label for="languageSelect" class="control-label">言語選択</label>
+                    <select id="languageSelect" class="language-select" aria-label="読み上げ言語を選択">
+                        <option value="auto">自動判定</option>
+                        <option value="ja-JP">日本語</option>
+                        <option value="en-US">英語 (米国)</option>
+                        <option value="en-GB">英語 (英国)</option>
+                    </select>
+                </div>
+                <div class="detected-language" id="detectedLanguage" aria-live="polite"></div>
+            </section>
+
+            <section class="voice-controls">
+                <div class="voice-grid">
+                    <div class="control-group">
+                        <label for="voiceSelect" class="control-label">音声選択</label>
+                        <select id="voiceSelect" class="voice-select" aria-label="音声を選択">
+                            <option value="">音声を読み込み中...</option>
+                        </select>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="genderSelect" class="control-label">性別</label>
+                        <select id="genderSelect" class="gender-select" aria-label="音声の性別を選択">
+                            <option value="all">すべて</option>
+                            <option value="female">女性</option>
+                            <option value="male">男性</option>
+                        </select>
+                    </div>
+
+                    <div class="control-group">
+                        <label for="rateSlider" class="control-label">
+                            速度: <span id="rateValue">1.0</span>倍
+                        </label>
+                        <input
+                            type="range"
+                            id="rateSlider"
+                            class="slider"
+                            min="0.1"
+                            max="2.0"
+                            step="0.1"
+                            value="1.0"
+                            aria-label="読み上げ速度"
+                        >
+                    </div>
+
+                    <div class="control-group">
+                        <label for="pitchSlider" class="control-label">
+                            ピッチ: <span id="pitchValue">1.0</span>
+                        </label>
+                        <input
+                            type="range"
+                            id="pitchSlider"
+                            class="slider"
+                            min="0.1"
+                            max="2.0"
+                            step="0.1"
+                            value="1.0"
+                            aria-label="音声ピッチ"
+                        >
+                    </div>
+
+                    <div class="control-group">
+                        <label for="volumeSlider" class="control-label">
+                            音量: <span id="volumeValue">100</span>%
+                        </label>
+                        <input
+                            type="range"
+                            id="volumeSlider"
+                            class="slider"
+                            min="0"
+                            max="100"
+                            step="10"
+                            value="100"
+                            aria-label="音量"
+                        >
+                    </div>
+                </div>
+            </section>
+
+            <section class="playback-controls">
+                <div class="button-group">
+                    <button id="playBtn" class="control-btn primary" aria-label="読み上げ開始">
+                        <span class="btn-icon">▶️</span>
+                        <span class="btn-text">再生</span>
+                    </button>
+                    <button id="pauseBtn" class="control-btn" aria-label="一時停止" disabled>
+                        <span class="btn-icon">⏸️</span>
+                        <span class="btn-text">一時停止</span>
+                    </button>
+                    <button id="stopBtn" class="control-btn" aria-label="停止" disabled>
+                        <span class="btn-icon">⏹️</span>
+                        <span class="btn-text">停止</span>
+                    </button>
+                </div>
+            </section>
+
+            <section class="visualizer-section">
+                <div class="visualizer-container">
+                    <canvas id="visualizer" class="visualizer" width="400" height="100" aria-label="音声波形表示"></canvas>
+                    <div class="status-display" id="statusDisplay" aria-live="polite">準備完了</div>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <script src="app.js"></script>
+</body>
+</html>

@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="UTF-8">
+    <title>Icon Generator 512x512</title>
+</head>
+<body>
+    <canvas id="canvas" width="512" height="512" style="border: 1px solid #ccc;"></canvas>
+    <br>
+    <a id="download" download="icon-512.png">Download icon-512.png</a>
+
+    <script>
+        const canvas = document.getElementById('canvas');
+        const ctx = canvas.getContext('2d');
+        const size = 512;
+
+        // Background gradient
+        const gradient = ctx.createLinearGradient(0, 0, size, size);
+        gradient.addColorStop(0, '#4facfe');
+        gradient.addColorStop(0.5, '#00f2fe');
+        gradient.addColorStop(1, '#667eea');
+
+        ctx.fillStyle = gradient;
+        ctx.fillRect(0, 0, size, size);
+
+        // Icon design
+        const centerX = size / 2;
+        const centerY = size / 2;
+        const scale = size / 200;
+
+        // Microphone
+        ctx.fillStyle = 'white';
+        ctx.strokeStyle = 'white';
+        ctx.lineWidth = 3 * scale;
+
+        // Mic body
+        ctx.beginPath();
+        ctx.roundRect(centerX - 15 * scale, centerY - 30 * scale, 30 * scale, 40 * scale, 15 * scale);
+        ctx.fill();
+
+        // Mic stand
+        ctx.beginPath();
+        ctx.moveTo(centerX, centerY + 10 * scale);
+        ctx.lineTo(centerX, centerY + 30 * scale);
+        ctx.stroke();
+
+        // Mic base
+        ctx.beginPath();
+        ctx.moveTo(centerX - 15 * scale, centerY + 30 * scale);
+        ctx.lineTo(centerX + 15 * scale, centerY + 30 * scale);
+        ctx.stroke();
+
+        // TTS Text
+        ctx.fillStyle = '#4facfe';
+        ctx.font = `bold ${Math.max(16, size * 0.08)}px Arial`;
+        ctx.textAlign = 'center';
+        ctx.textBaseline = 'middle';
+        ctx.fillText('TTS', centerX, centerY + 60 * scale);
+
+        // Setup download
+        canvas.toBlob(function(blob) {
+            const url = URL.createObjectURL(blob);
+            document.getElementById('download').href = url;
+        });
+    </script>
+</body>
+</html>
