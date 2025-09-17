@@ -12,7 +12,7 @@ class TextToSpeechApp {
 
     this.initializeElements();
     this.initializeEventListeners();
-    this.initializeTheme();
+    // テーマ機能削除
     this.initializeVoices();
     this.initializeVisualizer();
     this.initializePWA();
@@ -43,7 +43,6 @@ class TextToSpeechApp {
     this.stopBtn = document.getElementById('stopBtn');
 
     // UI関連
-    this.themeToggle = document.querySelector('.theme-toggle');
     this.statusDisplay = document.getElementById('statusDisplay');
     this.visualizerCanvas = document.getElementById('visualizer');
     this.visualizerCtx = this.visualizerCanvas.getContext('2d');
@@ -73,8 +72,7 @@ class TextToSpeechApp {
     this.pauseBtn.addEventListener('click', () => this.handlePause());
     this.stopBtn.addEventListener('click', () => this.handleStop());
 
-    // テーマ切り替え
-    this.themeToggle.addEventListener('click', () => this.toggleTheme());
+    // テーマ切り替え機能を削除（ダークモード廃止）
 
     // キーボードショートカット
     document.addEventListener('keydown', (e) => this.handleKeyboardShortcuts(e));
@@ -190,9 +188,10 @@ class TextToSpeechApp {
     // 性別フィルタリング
     const genderFilter = this.genderSelect.value;
     if (genderFilter !== 'all') {
-      filteredVoices = filteredVoices.filter(voice =>
-        this.getVoiceGender(voice) === genderFilter
-      );
+      filteredVoices = filteredVoices.filter(voice => {
+        const gender = this.getVoiceGender(voice);
+        return gender === genderFilter || (genderFilter === 'unknown' && gender === 'unknown');
+      });
     }
 
     if (filteredVoices.length === 0) {
@@ -201,35 +200,118 @@ class TextToSpeechApp {
 
     // 高品質音声を優先してソート
     filteredVoices.sort((a, b) => {
-      // ローカル音声を優先
+      // 品質による優先順位
+      const qualityOrder = { local: 0, default: 1, premium: 2, standard: 3 };
+
+      // ローカル音声を最優先
       if (a.localService !== b.localService) {
         return a.localService ? -1 : 1;
       }
-      // デフォルト音声を優先
+
+      // デフォルト音声を次に優先
       if (a.default !== b.default) {
         return a.default ? -1 : 1;
       }
+
+      // 性別で分類
+      const aGender = this.getVoiceGender(a);
+      const bGender = this.getVoiceGender(b);
+      if (aGender !== bGender) {
+        // 女性、男性、不明の順
+        const genderOrder = { female: 0, male: 1, unknown: 2 };
+        return (genderOrder[aGender] || 2) - (genderOrder[bGender] || 2);
+      }
+
       // 名前でソート
       return a.name.localeCompare(b.name);
     });
 
+    // 音声インデックスマッピングを保存
+    this.currentFilteredVoices = filteredVoices;
+
     filteredVoices.forEach((voice, index) => {
       const option = document.createElement('option');
       option.value = index;
-      option.textContent = `${voice.name} (${voice.lang})${voice.default ? ' ⭐' : ''}`;
+
+      // 音声の詳細情報を表示
+      const gender = this.getVoiceGender(voice);
+      const genderIcon = gender === 'female' ? '👩' : gender === 'male' ? '👨' : '🔊';
+      const qualityIcon = voice.localService ? '🏆' : voice.default ? '⭐' : '';
+
+      option.textContent = `${genderIcon} ${voice.name} (${voice.lang}) ${qualityIcon}`;
       this.voiceSelect.appendChild(option);
     });
 
-    // 最初のローカル音声または最初の音声を選択
-    const preferredIndex = filteredVoices.findIndex(voice => voice.localService) || 0;
+    // 最適な音声を自動選択
+    let preferredIndex = 0;
+
+    // 1. 現在の言語に完全一致するローカル音声
+    let bestMatch = filteredVoices.findIndex(voice =>
+      voice.localService && voice.lang === this.currentLanguage
+    );
+
+    // 2. 現在の言語に部分一致するローカル音声
+    if (bestMatch === -1) {
+      bestMatch = filteredVoices.findIndex(voice =>
+        voice.localService && voice.lang.startsWith(this.currentLanguage.split('-')[0])
+      );
+    }
+
+    // 3. 現在の言語のデフォルト音声
+    if (bestMatch === -1) {
+      bestMatch = filteredVoices.findIndex(voice =>
+        voice.default && voice.lang.startsWith(this.currentLanguage.split('-')[0])
+      );
+    }
+
+    // 4. 最初のローカル音声
+    if (bestMatch === -1) {
+      bestMatch = filteredVoices.findIndex(voice => voice.localService);
+    }
+
+    if (bestMatch !== -1) {
+      preferredIndex = bestMatch;
+    }
+
     this.voiceSelect.selectedIndex = preferredIndex;
   }
 
   getVoiceGender(voice) {
     const name = voice.name.toLowerCase();
-    const femaleKeywords = ['female', 'woman', 'girl', 'さくら', 'はるか', 'kyoko', 'otoya', 'sara'];
-    const maleKeywords = ['male', 'man', 'boy', 'たろう', 'takeshi', 'ichiro'];
 
+    // より詳細な音声識別キーワード
+    const femaleKeywords = [
+      'female', 'woman', 'girl', 'lady', 'f',
+      'さくら', 'はるか', 'kyoko', 'sara', 'voice1', 'voice3',
+      'zira', 'hazel', 'susan', 'helen', 'karen', 'samantha',
+      'microsoft haruka', 'microsoft sayaka', 'microsoft ayumi'
+    ];
+
+    const maleKeywords = [
+      'male', 'man', 'boy', 'gentleman', 'm',
+      'たろう', 'takeshi', 'ichiro', 'voice2', 'voice4',
+      'david', 'mark', 'george', 'alex', 'daniel',
+      'microsoft ichiro', 'microsoft haruto'
+    ];
+
+    // 日本語音声の特別判定
+    if (voice.lang && voice.lang.startsWith('ja')) {
+      // Microsoft 日本語音声の判定
+      if (name.includes('haruka') || name.includes('sayaka') || name.includes('ayumi')) return 'female';
+      if (name.includes('ichiro') || name.includes('haruto')) return 'male';
+
+      // Google 日本語音声の判定
+      if (name.includes('female') || name.includes('woman')) return 'female';
+      if (name.includes('male') || name.includes('man')) return 'male';
+    }
+
+    // 英語音声の判定
+    if (voice.lang && voice.lang.startsWith('en')) {
+      if (femaleKeywords.some(keyword => name.includes(keyword))) return 'female';
+      if (maleKeywords.some(keyword => name.includes(keyword))) return 'male';
+    }
+
+    // 一般的な判定
     if (femaleKeywords.some(keyword => name.includes(keyword))) {
       return 'female';
     }
@@ -237,8 +319,13 @@ class TextToSpeechApp {
       return 'male';
     }
 
-    // 音声名から推測できない場合、デフォルトは女性（統計的に多いため）
-    return 'female';
+    // 推測不可能な場合は音声の特性で判定（簡易版）
+    // 日本語音声はデフォルトで女性、英語音声は不明として扱う
+    if (voice.lang && voice.lang.startsWith('ja')) {
+      return 'female';
+    }
+
+    return 'unknown';
   }
 
   filterVoicesByLanguage(lang) {
@@ -266,26 +353,32 @@ class TextToSpeechApp {
   }
 
   createUtterance() {
-    const text = this.textInput.value.trim();
+    let text = this.textInput.value.trim();
     if (!text) {
       this.showError('テキストを入力してください。');
       return null;
     }
 
+    // テキストの前処理（日本語音声品質改善）
+    text = this.preprocessText(text);
+
     this.utterance = new SpeechSynthesisUtterance(text);
 
-    // 音声選択
-    const selectedVoiceIndex = this.voiceSelect.value;
-    if (selectedVoiceIndex && this.voices[selectedVoiceIndex]) {
+    // 音声選択（改良されたマッピング使用）
+    const selectedVoiceIndex = parseInt(this.voiceSelect.value);
+    if (this.currentFilteredVoices && this.currentFilteredVoices[selectedVoiceIndex]) {
+      this.utterance.voice = this.currentFilteredVoices[selectedVoiceIndex];
+    } else if (this.voices[selectedVoiceIndex]) {
       this.utterance.voice = this.voices[selectedVoiceIndex];
     }
 
     // 言語設定
     this.utterance.lang = this.currentLanguage;
 
-    // 音声パラメータ設定
-    this.utterance.rate = parseFloat(this.rateSlider.value);
-    this.utterance.pitch = parseFloat(this.pitchSlider.value);
+    // 音声パラメータ設定（日本語音声最適化）
+    const selectedVoice = this.utterance.voice;
+    this.utterance.rate = this.optimizeRateForVoice(parseFloat(this.rateSlider.value), selectedVoice);
+    this.utterance.pitch = this.optimizePitchForVoice(parseFloat(this.pitchSlider.value), selectedVoice);
     this.utterance.volume = parseFloat(this.volumeSlider.value) / 100;
 
     // イベントハンドラ設定
@@ -298,6 +391,64 @@ class TextToSpeechApp {
     return this.utterance;
   }
 
+  preprocessText(text) {
+    // 絵文字や特殊記号を除去（読み上げスキップ）
+    text = text.replace(/[\u{1F600}-\u{1F64F}\u{1F300}-\u{1F5FF}\u{1F680}-\u{1F6FF}\u{1F1E0}-\u{1F1FF}\u{2600}-\u{26FF}\u{2700}-\u{27BF}]/gu, '');
+
+    // 機械的記号を読みやすい形に変換
+    text = text.replace(/&/g, 'アンド');
+    text = text.replace(/@/g, 'アットマーク');
+    text = text.replace(/#/g, 'ハッシュ');
+    text = text.replace(/\$/g, 'ドル');
+    text = text.replace(/%/g, 'パーセント');
+    text = text.replace(/\+/g, 'プラス');
+    text = text.replace(/=/g, 'イコール');
+
+    // URLの簡略化
+    text = text.replace(/https?:\/\/[^\s]+/g, 'リンク');
+
+    // メールアドレスの簡略化
+    text = text.replace(/[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}/g, 'メールアドレス');
+
+    // 連続する句読点の正規化
+    text = text.replace(/[。]{2,}/g, '。');
+    text = text.replace(/[、]{2,}/g, '、');
+
+    // 数字の読み上げ改善
+    text = text.replace(/(\d+)年/g, '$1ねん');
+    text = text.replace(/(\d+)月/g, '$1がつ');
+    text = text.replace(/(\d+)日/g, '$1にち');
+
+    // 空白の正規化
+    text = text.replace(/\s+/g, ' ').trim();
+
+    return text;
+  }
+
+  optimizeRateForVoice(rate, voice) {
+    if (!voice) return rate;
+
+    // 日本語音声の速度最適化
+    if (voice.lang && voice.lang.startsWith('ja')) {
+      // 日本語音声は通常より遅めが自然
+      return Math.max(0.7, rate * 0.9);
+    }
+
+    return rate;
+  }
+
+  optimizePitchForVoice(pitch, voice) {
+    if (!voice) return pitch;
+
+    // 日本語音声のピッチ最適化
+    if (voice.lang && voice.lang.startsWith('ja')) {
+      // 極端なピッチ変更を避ける
+      return Math.max(0.8, Math.min(1.2, pitch));
+    }
+
+    return pitch;
+  }
+
   handlePlay() {
     if (!this.isPlaying && !this.isPaused) {
       // 新規再生
@@ -306,18 +457,20 @@ class TextToSpeechApp {
 
       this.synth.speak(utterance);
     } else if (this.isPaused) {
-      // 再開
+      // 一時停止からの再開
       this.synth.resume();
     }
   }
 
   handlePause() {
     if (this.isPlaying && !this.isPaused) {
+      // 読み上げ中の場合のみ一時停止
       this.synth.pause();
     }
   }
 
   handleStop() {
+    // 完全停止：読み上げをキャンセルして最初から停止
     this.synth.cancel();
     this.handleSpeechEnd();
   }
@@ -360,9 +513,23 @@ class TextToSpeechApp {
   }
 
   updateControlButtons() {
+    // 再生ボタン：停止中または一時停止中に有効
     this.playBtn.disabled = this.isPlaying && !this.isPaused;
+
+    // 一時停止ボタン：読み上げ中のみ有効
     this.pauseBtn.disabled = !this.isPlaying || this.isPaused;
+
+    // 停止ボタン：読み上げ中または一時停止中に有効
     this.stopBtn.disabled = !this.isPlaying && !this.isPaused;
+
+    // ボタンテキストの更新
+    if (this.isPaused) {
+      this.playBtn.querySelector('.btn-text').textContent = '再開';
+      this.playBtn.setAttribute('aria-label', '読み上げ再開');
+    } else {
+      this.playBtn.querySelector('.btn-text').textContent = '再生';
+      this.playBtn.setAttribute('aria-label', '読み上げ開始');
+    }
   }
 
   updateStatus(message, type = 'ready') {
@@ -486,50 +653,12 @@ class TextToSpeechApp {
           event.preventDefault();
           this.handleStop();
           break;
-        case 'd':
-          event.preventDefault();
-          this.toggleTheme();
-          break;
+        // ダークモード機能削除済み
       }
     }
   }
 
-  initializeTheme() {
-    // システム設定またはローカルストレージからテーマを読み込み
-    const savedTheme = localStorage.getItem('tts-pwa-theme');
-    const systemDarkMode = window.matchMedia('(prefers-color-scheme: dark)').matches;
-
-    const theme = savedTheme || (systemDarkMode ? 'dark' : 'light');
-    this.setTheme(theme);
-
-    // システムテーマ変更の監視
-    window.matchMedia('(prefers-color-scheme: dark)').addEventListener('change', (e) => {
-      if (!localStorage.getItem('tts-pwa-theme')) {
-        this.setTheme(e.matches ? 'dark' : 'light');
-      }
-    });
-  }
-
-  toggleTheme() {
-    const currentTheme = document.documentElement.getAttribute('data-theme') || 'light';
-    const newTheme = currentTheme === 'light' ? 'dark' : 'light';
-    this.setTheme(newTheme);
-  }
-
-  setTheme(theme) {
-    document.documentElement.setAttribute('data-theme', theme);
-    localStorage.setItem('tts-pwa-theme', theme);
-
-    // テーマアイコンの更新
-    const themeIcon = this.themeToggle.querySelector('.theme-icon');
-    themeIcon.textContent = theme === 'dark' ? '☀️' : '🌙';
-
-    // メタテーマカラーの更新
-    const metaThemeColor = document.querySelector('meta[name="theme-color"]');
-    if (metaThemeColor) {
-      metaThemeColor.content = theme === 'dark' ? '#1a1a2e' : '#4facfe';
-    }
-  }
+  // テーマ機能削除（ライトモード固定）
 
   handleVisibilityChange() {
     // ページが非表示になったときに音声を停止（オプション）

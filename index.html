@@ -20,9 +20,6 @@
                 <span aria-hidden="true">🎤</span>
                 Text-to-Speech PWA
             </h1>
-            <button class="theme-toggle" aria-label="ダークモード切り替え" title="テーマを切り替え">
-                <span class="theme-icon">🌙</span>
-            </button>
         </header>
 
         <div class="main-content">
@@ -62,11 +59,12 @@
                     </div>
 
                     <div class="control-group">
-                        <label for="genderSelect" class="control-label">性別</label>
-                        <select id="genderSelect" class="gender-select" aria-label="音声の性別を選択">
-                            <option value="all">すべて</option>
-                            <option value="female">女性</option>
-                            <option value="male">男性</option>
+                        <label for="genderSelect" class="control-label">性別フィルター</label>
+                        <select id="genderSelect" class="gender-select" aria-label="音声の性別でフィルター">
+                            <option value="all">すべて表示</option>
+                            <option value="female">👩 女性音声</option>
+                            <option value="male">👨 男性音声</option>
+                            <option value="unknown">🔊 その他</option>
                         </select>
                     </div>
 
@@ -126,11 +124,11 @@
                         <span class="btn-icon">▶️</span>
                         <span class="btn-text">再生</span>
                     </button>
-                    <button id="pauseBtn" class="control-btn" aria-label="一時停止" disabled>
+                    <button id="pauseBtn" class="control-btn pause" aria-label="一時停止" disabled>
                         <span class="btn-icon">⏸️</span>
                         <span class="btn-text">一時停止</span>
                     </button>
-                    <button id="stopBtn" class="control-btn" aria-label="停止" disabled>
+                    <button id="stopBtn" class="control-btn stop" aria-label="停止" disabled>
                         <span class="btn-icon">⏹️</span>
                         <span class="btn-text">停止</span>
                     </button>
