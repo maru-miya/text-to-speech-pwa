@@ -1,32 +1,44 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg width="192" height="192" viewBox="0 0 192 192" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#4facfe;stop-opacity:1" />
-      <stop offset="50%" style="stop-color:#00f2fe;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#667eea;stop-opacity:1" />
+    <linearGradient id="bg-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#2563eb;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#3b82f6;stop-opacity:1" />
     </linearGradient>
   </defs>
 
   <!-- Background with rounded corners -->
-  <rect width="192" height="192" rx="42.24" ry="42.24" fill="url(#gradient)"/>
+  <rect x="0" y="0" width="192" height="192" rx="38" ry="38" fill="url(#bg-gradient)"/>
 
-  <!-- Microphone icon -->
-  <g transform="translate(96.0, 96.0)">
-    <!-- Microphone body -->
-    <rect x="-11.52" y="-23.04" width="23.04" height="28.799999999999997" rx="11.52" fill="white"/>
+  <!-- Microphone body -->
+  <rect x="82" y="48" width="28" height="44" rx="14" ry="14" fill="white"/>
 
-    <!-- Microphone stand -->
-    <line x1="0" y1="5.76" x2="0" y2="23.04" stroke="white" stroke-width="1.92" stroke-linecap="round"/>
+  <!-- Microphone handle -->
+  <rect x="94" y="92" width="4" height="24" fill="white"/>
 
-    <!-- Microphone base -->
-    <line x1="-9.600000000000001" y1="23.04" x2="9.600000000000001" y2="23.04" stroke="white" stroke-width="2.88" stroke-linecap="round"/>
+  <!-- Microphone base -->
+  <rect x="86" y="116" width="20" height="6" rx="3" ry="3" fill="white"/>
 
-    <!-- Sound waves -->
-    <path d="M 15.36 -7.68 Q 28.799999999999997 -15.36 28.799999999999997 0 Q 28.799999999999997 15.36 15.36 7.68"
-          stroke="white" stroke-width="1.536" fill="none" opacity="0.8"/>
-
-    <path d="M 23.04 -11.52 Q 42.24 -23.04 42.24 0 Q 42.24 23.04 23.04 11.52"
-          stroke="white" stroke-width="1.1520000000000001" fill="none" opacity="0.6"/>
+  <!-- Sound waves -->
+  <g stroke="white" stroke-width="3" fill="none">
+    <!-- Wave 1 (closest) -->
+    <path d="M 116 64 Q 128 72 128 88 Q 128 104 116 112"/>
+    <!-- Wave 2 (middle) -->
+    <path d="M 124 56 Q 140 68 140 88 Q 140 108 124 120"/>
+    <!-- Wave 3 (farthest) -->
+    <path d="M 132 48 Q 152 64 152 88 Q 152 112 132 128"/>
   </g>
+
+  <!-- Sound wave dots for visual appeal -->
+  <circle cx="120" cy="76" r="2" fill="white" opacity="0.7"/>
+  <circle cx="120" cy="88" r="2" fill="white" opacity="0.9"/>
+  <circle cx="120" cy="100" r="2" fill="white" opacity="0.7"/>
+
+  <circle cx="132" cy="72" r="1.5" fill="white" opacity="0.6"/>
+  <circle cx="132" cy="88" r="1.5" fill="white" opacity="0.8"/>
+  <circle cx="132" cy="104" r="1.5" fill="white" opacity="0.6"/>
+
+  <circle cx="144" cy="68" r="1" fill="white" opacity="0.5"/>
+  <circle cx="144" cy="88" r="1" fill="white" opacity="0.7"/>
+  <circle cx="144" cy="108" r="1" fill="white" opacity="0.5"/>
 </svg>

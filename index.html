@@ -5,6 +5,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>maru-text-to-speech</title>
     <meta name="description" content="シンプルで使いやすいテキスト読み上げツール">
+    <link rel="apple-touch-icon" href="icons/apple-touch-icon.svg">
+    <meta name="theme-color" content="#2563eb">
     <style>
         * {
             margin: 0;
@@ -102,7 +104,7 @@
             font-weight: 500;
         }
 
-        .btn-speak {
+        .btn-play-pause {
             background: #2563eb;
             color: white;
             width: 56px;
@@ -113,23 +115,54 @@
             justify-content: center;
             box-shadow: 0 4px 6px rgba(37, 99, 235, 0.15);
             font-size: 18px;
+            position: relative;
+            overflow: hidden;
         }
 
-        .btn-speak:hover {
+        .btn-play-pause.playing {
+            background: #f59e0b;
+            box-shadow: 0 4px 6px rgba(245, 158, 11, 0.15);
+        }
+
+        .btn-play-pause:hover {
             background: #3b82f6;
         }
 
-        .btn-speak:active {
+        .btn-play-pause.playing:hover {
+            background: #d97706;
+        }
+
+        .btn-play-pause:active {
             background: #1d4ed8;
+        }
+
+        .btn-play-pause.playing:active {
+            background: #b45309;
+        }
+
+        .btn-icon {
+            transition: opacity 0.2s ease-out;
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+        }
+
+        .btn-icon.hidden {
+            opacity: 0;
         }
 
         .btn-stop {
             background: #ffffff;
             color: #6b7280;
             border: 1px solid #e5e7eb;
-            padding: 8px 16px;
+            width: 40px;
+            height: 40px;
             border-radius: 6px;
             font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .btn-stop:hover {
@@ -283,16 +316,18 @@
         }
 
         .skip-btn {
-            width: 40px;
+            width: 48px;
             height: 40px;
             border: 1px solid #e5e7eb;
             border-radius: 6px;
             background: #ffffff;
             display: flex;
+            flex-direction: column;
             align-items: center;
             justify-content: center;
             cursor: pointer;
             transition: all 0.2s ease-out;
+            position: relative;
         }
 
         .skip-btn:hover {
@@ -301,17 +336,62 @@
         }
 
         .skip-btn svg {
-            width: 16px;
-            height: 16px;
-            stroke: #6b7280;
-            stroke-width: 2px;
-            fill: none;
+            width: 18px;
+            height: 18px;
+            stroke: #374151;
+            stroke-width: 3px;
+            fill: #374151;
+        }
+
+        .skip-text {
+            font-size: 11px;
+            font-weight: 600;
+            color: #374151;
+            margin-top: 2px;
+            line-height: 1;
         }
 
         .skip-controls {
             display: flex;
             align-items: center;
-            gap: 8px;
+            gap: 12px;
+            justify-content: center;
+        }
+
+        @media (max-width: 480px) {
+            .buttons {
+                margin: 24px 0;
+            }
+
+            .skip-controls {
+                gap: 8px;
+            }
+
+            .btn-play-pause {
+                width: 52px;
+                height: 52px;
+            }
+
+            .skip-btn {
+                width: 44px;
+                height: 36px;
+            }
+
+            .skip-btn svg {
+                width: 16px;
+                height: 16px;
+            }
+
+            .skip-text {
+                font-size: 10px;
+                margin-top: 1px;
+            }
+
+            .btn-stop {
+                width: 36px;
+                height: 36px;
+                margin-top: 12px;
+            }
         }
     </style>
 </head>
@@ -361,25 +441,33 @@
             <div class="skip-controls">
                 <button id="skipBackBtn" class="skip-btn" title="15秒戻る">
                     <svg viewBox="0 0 24 24">
-                        <path d="M11 7l-5 5 5 5M18 7l-5 5 5 5"/>
-                        <text x="12" y="16" text-anchor="middle" font-size="6" fill="#6b7280">15</text>
+                        <path d="M11 12L6 7v10l5-5z"/>
+                        <path d="M18 12L13 7v10l5-5z"/>
                     </svg>
+                    <span class="skip-text">15</span>
                 </button>
-                <button id="speakBtn" class="btn-speak">
-                    <svg viewBox="0 0 24 24" fill="currentColor">
+                <button id="playPauseBtn" class="btn-play-pause">
+                    <svg class="btn-icon play-icon" viewBox="0 0 24 24" fill="white">
                         <path d="M8 5v14l11-7z"/>
+                    </svg>
+                    <svg class="btn-icon pause-icon hidden" viewBox="0 0 24 24" fill="white">
+                        <path d="M6 5h4v14H6V5zm8 0h4v14h-4V5z"/>
                     </svg>
                 </button>
                 <button id="skipForwardBtn" class="skip-btn" title="15秒進む">
                     <svg viewBox="0 0 24 24">
-                        <path d="M13 17l5-5-5-5M6 17l5-5-5-5"/>
-                        <text x="12" y="16" text-anchor="middle" font-size="6" fill="#6b7280">15</text>
+                        <path d="M13 12l5-5v10l-5-5z"/>
+                        <path d="M6 12l5-5v10l-5-5z"/>
                     </svg>
+                    <span class="skip-text">15</span>
                 </button>
             </div>
-            <div style="display: flex; gap: 8px; margin-top: 16px;">
-                <button id="pauseBtn" class="btn-pause">一時停止</button>
-                <button id="stopBtn" class="btn-stop">停止</button>
+            <div style="display: flex; justify-content: center; margin-top: 16px;">
+                <button id="stopBtn" class="btn-stop" title="停止">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                        <rect x="6" y="6" width="12" height="12"/>
+                    </svg>
+                </button>
             </div>
         </div>
         
@@ -394,6 +482,22 @@
         let isPaused = false;
         let currentText = '';
         let currentPosition = 0;
+        let isPlaying = false;
+
+        // ボタンアイコン切り替え機能
+        function updatePlayPauseButton(playing) {
+            if (playing) {
+                playIcon.classList.add('hidden');
+                pauseIcon.classList.remove('hidden');
+                playPauseBtn.classList.add('playing');
+                isPlaying = true;
+            } else {
+                playIcon.classList.remove('hidden');
+                pauseIcon.classList.add('hidden');
+                playPauseBtn.classList.remove('playing');
+                isPlaying = false;
+            }
+        }
 
         // DOM要素の取得
         const textInput = document.getElementById('textInput');
@@ -402,8 +506,9 @@
         const rateValue = document.getElementById('rateValue');
         const pitchRange = document.getElementById('pitchRange');
         const pitchValue = document.getElementById('pitchValue');
-        const speakBtn = document.getElementById('speakBtn');
-        const pauseBtn = document.getElementById('pauseBtn');
+        const playPauseBtn = document.getElementById('playPauseBtn');
+        const playIcon = document.querySelector('.play-icon');
+        const pauseIcon = document.querySelector('.pause-icon');
         const stopBtn = document.getElementById('stopBtn');
         const skipBackBtn = document.getElementById('skipBackBtn');
         const skipForwardBtn = document.getElementById('skipForwardBtn');
@@ -623,8 +728,25 @@
             return targetVoices.length > 0 ? targetVoices[0] : null;
         }
 
-        // 読み上げ機能
-        speakBtn.addEventListener('click', () => {
+        // 読み上げ/一時停止機能
+        playPauseBtn.addEventListener('click', () => {
+            // 一時停止中の場合は再開
+            if (isPaused) {
+                synth.resume();
+                isPaused = false;
+                updatePlayPauseButton(true);
+                status.textContent = '読み上げ中...';
+                return;
+            }
+
+            // 再生中の場合は一時停止
+            if (isPlaying && synth.speaking) {
+                synth.pause();
+                isPaused = true;
+                updatePlayPauseButton(false);
+                status.textContent = '一時停止中...';
+                return;
+            }
             const text = textInput.value.trim();
 
             if (!text) {
@@ -635,7 +757,6 @@
             // 既存の読み上げを停止
             synth.cancel();
             isPaused = false;
-            pauseBtn.textContent = '一時停止';
             currentPosition = 0;
 
             // 言語検出
@@ -675,8 +796,8 @@
             // イベントハンドラ
             utterance.onstart = () => {
                 status.textContent = '読み上げ中...';
-                speakBtn.disabled = true;
-                pauseBtn.disabled = false;
+                updatePlayPauseButton(true);
+                playPauseBtn.disabled = false;
                 skipBackBtn.disabled = false;
                 skipForwardBtn.disabled = false;
             };
@@ -695,20 +816,6 @@
             synth.speak(utterance);
         });
         
-        // 一時停止/再開機能
-        pauseBtn.addEventListener('click', () => {
-            if (synth.speaking && !isPaused) {
-                synth.pause();
-                isPaused = true;
-                pauseBtn.textContent = '再開';
-                status.textContent = '一時停止中...';
-            } else if (isPaused) {
-                synth.resume();
-                isPaused = false;
-                pauseBtn.textContent = '一時停止';
-                status.textContent = '読み上げ中...';
-            }
-        });
 
         // 停止機能
         stopBtn.addEventListener('click', () => {
@@ -718,7 +825,6 @@
         });
         
         // 初期状態の設定
-        pauseBtn.disabled = true;
         skipBackBtn.disabled = true;
         skipForwardBtn.disabled = true;
 
@@ -777,8 +883,8 @@
 
             utterance.onstart = () => {
                 status.textContent = '読み上げ中...';
-                speakBtn.disabled = true;
-                pauseBtn.disabled = false;
+                updatePlayPauseButton(true);
+                playPauseBtn.disabled = false;
                 skipBackBtn.disabled = false;
                 skipForwardBtn.disabled = false;
             };
@@ -797,13 +903,12 @@
         }
 
         function resetButtons() {
-            speakBtn.disabled = false;
-            pauseBtn.disabled = true;
+            updatePlayPauseButton(false);
+            playPauseBtn.disabled = false;
             skipBackBtn.disabled = true;
             skipForwardBtn.disabled = true;
             currentUtterance = null;
             isPaused = false;
-            pauseBtn.textContent = '一時停止';
             currentPosition = 0;
         }
 
@@ -819,8 +924,7 @@
         // ブラウザ対応チェック
         if (!('speechSynthesis' in window)) {
             alert('お使いのブラウザは音声合成に対応していません');
-            speakBtn.disabled = true;
-            pauseBtn.disabled = true;
+            playPauseBtn.disabled = true;
         }
     </script>
 </body>

@@ -1,32 +1,44 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
   <defs>
-    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#4facfe;stop-opacity:1" />
-      <stop offset="50%" style="stop-color:#00f2fe;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#667eea;stop-opacity:1" />
+    <linearGradient id="bg-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#2563eb;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#3b82f6;stop-opacity:1" />
     </linearGradient>
   </defs>
 
   <!-- Background with rounded corners -->
-  <rect width="512" height="512" rx="112.64" ry="112.64" fill="url(#gradient)"/>
+  <rect x="0" y="0" width="512" height="512" rx="102" ry="102" fill="url(#bg-gradient)"/>
 
-  <!-- Microphone icon -->
-  <g transform="translate(256.0, 256.0)">
-    <!-- Microphone body -->
-    <rect x="-30.72" y="-61.44" width="61.44" height="76.8" rx="30.72" fill="white"/>
+  <!-- Microphone body -->
+  <rect x="218" y="128" width="76" height="118" rx="38" ry="38" fill="white"/>
 
-    <!-- Microphone stand -->
-    <line x1="0" y1="15.36" x2="0" y2="61.44" stroke="white" stroke-width="5.12" stroke-linecap="round"/>
+  <!-- Microphone handle -->
+  <rect x="246" y="246" width="10" height="64" fill="white"/>
 
-    <!-- Microphone base -->
-    <line x1="-25.6" y1="61.44" x2="25.6" y2="61.44" stroke="white" stroke-width="7.68" stroke-linecap="round"/>
+  <!-- Microphone base -->
+  <rect x="228" y="310" width="56" height="16" rx="8" ry="8" fill="white"/>
 
-    <!-- Sound waves -->
-    <path d="M 40.96 -20.48 Q 76.8 -40.96 76.8 0 Q 76.8 40.96 40.96 20.48"
-          stroke="white" stroke-width="4.096" fill="none" opacity="0.8"/>
-
-    <path d="M 61.44 -30.72 Q 112.64 -61.44 112.64 0 Q 112.64 61.44 61.44 30.72"
-          stroke="white" stroke-width="3.072" fill="none" opacity="0.6"/>
+  <!-- Sound waves -->
+  <g stroke="white" stroke-width="8" fill="none">
+    <!-- Wave 1 (closest) -->
+    <path d="M 310 170 Q 342 192 342 236 Q 342 280 310 302"/>
+    <!-- Wave 2 (middle) -->
+    <path d="M 330 150 Q 374 182 374 236 Q 374 290 330 322"/>
+    <!-- Wave 3 (farthest) -->
+    <path d="M 350 128 Q 406 172 406 236 Q 406 300 350 344"/>
   </g>
+
+  <!-- Sound wave dots for visual appeal -->
+  <circle cx="320" cy="203" r="5" fill="white" opacity="0.7"/>
+  <circle cx="320" cy="236" r="5" fill="white" opacity="0.9"/>
+  <circle cx="320" cy="269" r="5" fill="white" opacity="0.7"/>
+
+  <circle cx="352" cy="192" r="4" fill="white" opacity="0.6"/>
+  <circle cx="352" cy="236" r="4" fill="white" opacity="0.8"/>
+  <circle cx="352" cy="280" r="4" fill="white" opacity="0.6"/>
+
+  <circle cx="384" cy="182" r="3" fill="white" opacity="0.5"/>
+  <circle cx="384" cy="236" r="3" fill="white" opacity="0.7"/>
+  <circle cx="384" cy="290" r="3" fill="white" opacity="0.5"/>
 </svg>
