@@ -647,6 +647,105 @@
         let currentPosition = 0;
         let isPlaying = false;
 
+        // リアルタイム変更用の変数
+        let originalText = ''; // 元のテキスト（変更検知用）
+        let currentSentenceIndex = 0; // 現在の文章インデックス（日本語分割用）
+        let allSentences = []; // 分割された全文章（日本語用）
+        let isRealTimeChanging = false; // リアルタイム変更中フラグ
+
+        // リアルタイム変更用ユーティリティ関数
+        function handleRealtimeParamChange() {
+            if (!isPlaying || isPaused || isRealTimeChanging) return;
+
+            isRealTimeChanging = true;
+
+            // スムーズな切り替えのため、最小限の表示更新
+            const originalStatus = status.textContent;
+            status.textContent = '更新中...';
+
+            // 現在の読み上げを停止
+            synth.cancel();
+
+            // 50ms後に新しいパラメータで再開（スムーズな切り替え）
+            setTimeout(() => {
+                if (allSentences.length > 0 && currentSentenceIndex < allSentences.length) {
+                    // 日本語の場合：現在の文章から再開
+                    continueJapaneseSpeech();
+                } else {
+                    // 英語その他の場合：最初から再開
+                    continueNormalSpeech();
+                }
+
+                // 切り替え完了後、適切なステータスに戻す
+                setTimeout(() => {
+                    if (isPlaying) {
+                        status.textContent = '読み上げ中...';
+                    }
+                    isRealTimeChanging = false;
+                }, 100);
+            }, 50);
+        }
+
+        function continueJapaneseSpeech() {
+            const detectedLang = detectLanguage(originalText);
+            if (detectedLang === 'ja') {
+                speakJapaneseFromIndex(currentSentenceIndex);
+            }
+        }
+
+        function continueNormalSpeech() {
+            const text = textInput.value.trim();
+            if (!text) return;
+
+            const detectedLang = detectLanguage(text);
+            let processedText = text;
+
+            if (detectedLang === 'en') {
+                processedText = preprocessEnglishText(text);
+            } else if (detectedLang === 'ja') {
+                processedText = preprocessJapaneseText(text);
+            }
+
+            const utterance = new SpeechSynthesisUtterance(processedText);
+            currentUtterance = utterance;
+
+            // 音声選択
+            const selectedIndex = voiceSelect.value;
+            if (selectedIndex !== '' && voices[selectedIndex]) {
+                utterance.voice = voices[selectedIndex];
+            } else {
+                const optimalVoice = getOptimalVoice(detectedLang);
+                if (optimalVoice) {
+                    utterance.voice = optimalVoice;
+                }
+            }
+
+            // パラメータ設定
+            if (detectedLang === 'en') {
+                utterance.rate = parseFloat(rateRange.value) * 0.9;
+                utterance.pitch = parseFloat(pitchRange.value);
+            } else {
+                utterance.rate = parseFloat(rateRange.value);
+                utterance.pitch = parseFloat(pitchRange.value);
+            }
+
+            utterance.onstart = () => {
+                status.textContent = '読み上げ中...';
+            };
+
+            utterance.onend = () => {
+                status.textContent = '読み上げ完了';
+                resetButtons();
+            };
+
+            utterance.onerror = () => {
+                status.textContent = 'エラーが発生しました';
+                resetButtons();
+            };
+
+            synth.speak(utterance);
+        }
+
         // ボタンアイコン切り替え機能
         function updatePlayPauseButton(playing) {
             if (playing) {
@@ -868,11 +967,17 @@
         rateRange.addEventListener('input', () => {
             rateValue.textContent = rateRange.value;
             updateActivePresetBtn('rate', rateRange.value);
+
+            // リアルタイム速度変更
+            handleRealtimeParamChange();
         });
 
         pitchRange.addEventListener('input', () => {
             pitchValue.textContent = pitchRange.value;
             updateActivePresetBtn('pitch', pitchRange.value);
+
+            // リアルタイムピッチ変更
+            handleRealtimeParamChange();
         });
 
         // プリセットボタンの機能
@@ -895,6 +1000,9 @@
                 rateRange.value = rate;
                 rateValue.textContent = rate;
                 updateActivePresetBtn('rate', rate);
+
+                // リアルタイム速度変更
+                handleRealtimeParamChange();
             });
         });
 
@@ -905,12 +1013,27 @@
                 pitchRange.value = pitch;
                 pitchValue.textContent = pitch;
                 updateActivePresetBtn('pitch', pitch);
+
+                // リアルタイムピッチ変更
+                handleRealtimeParamChange();
             });
         });
 
-        // テキスト入力時の言語検出
+        // テキスト入力時の言語検出とリアルタイム変更検知
         textInput.addEventListener('input', () => {
             const text = textInput.value.trim();
+
+            // 読み上げ中にテキストが変更された場合
+            if (isPlaying && originalText && text !== originalText) {
+                synth.cancel();
+                status.textContent = 'テキストが変更されました';
+                resetButtons();
+                originalText = '';
+                allSentences = [];
+                currentSentenceIndex = 0;
+            }
+
+            // 言語検出
             if (text) {
                 const lang = detectLanguage(text);
                 const langName = lang === 'ja' ? '日本語' : 'English';
@@ -1032,6 +1155,7 @@
             }
 
             currentText = processedText;
+            originalText = text; // リアルタイム変更検知用
 
             // 日本語の場合は文章分割して自然な間を作る
             if (detectedLang === 'ja') {
@@ -1067,17 +1191,24 @@
         // 日本語文章分割読み上げ機能
         function speakJapaneseWithPauses(text) {
             // 文章を句点と段落で分割
-            const sentences = text.split(/([。！？]|\n\n+)/).filter(s => s.trim());
-            let currentSentenceIndex = 0;
+            allSentences = text.split(/([。！？]|\n\n+)/).filter(s => s.trim());
+            currentSentenceIndex = 0;
+            originalText = text;
+
+            speakJapaneseFromIndex(0);
+        }
+
+        function speakJapaneseFromIndex(startIndex) {
+            currentSentenceIndex = startIndex;
 
             function speakNextSentence() {
-                if (currentSentenceIndex >= sentences.length) {
+                if (currentSentenceIndex >= allSentences.length) {
                     status.textContent = '読み上げ完了';
                     resetButtons();
                     return;
                 }
 
-                const sentence = sentences[currentSentenceIndex].trim();
+                const sentence = allSentences[currentSentenceIndex].trim();
                 currentSentenceIndex++;
 
                 // 空の文や区切り文字のみの場合はスキップ
@@ -1127,7 +1258,7 @@
 
                 utterance.onend = () => {
                     // 文と文の間に300ms、段落の間に500msの自然な間を追加
-                    const nextSentence = sentences[currentSentenceIndex];
+                    const nextSentence = allSentences[currentSentenceIndex];
                     const pauseDuration = (nextSentence && nextSentence.includes('\n')) ? 500 : 300;
 
                     setTimeout(speakNextSentence, pauseDuration);
@@ -1261,6 +1392,9 @@
             currentUtterance = null;
             isPaused = false;
             currentPosition = 0;
+
+            // リアルタイム変更用変数もリセット
+            isRealTimeChanging = false;
         }
 
         // スキップボタンのイベントリスナー
