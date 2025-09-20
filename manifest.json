@@ -1,7 +1,7 @@
 {
-  "name": "maru-text-to-speech",
-  "short_name": "maru-TTS",
-  "description": "英語・日本語対応 高品質テキスト読み上げアプリケーション - maru-text-to-speech",
+  "name": "Maru-Text-to-Speech",
+  "short_name": "Maru-TTS",
+  "description": "英語・日本語対応 高品質テキスト読み上げアプリケーション - Maru-Text-to-Speech",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",
