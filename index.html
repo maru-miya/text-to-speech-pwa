@@ -351,11 +351,15 @@
             line-height: 1;
         }
 
-        .skip-controls {
+        .control-buttons {
             display: flex;
             align-items: center;
             gap: 12px;
             justify-content: center;
+            background: #f9fafb;
+            padding: 16px 20px;
+            border-radius: 12px;
+            border: 1px solid #e5e7eb;
         }
 
         @media (max-width: 480px) {
@@ -363,8 +367,9 @@
                 margin: 24px 0;
             }
 
-            .skip-controls {
-                gap: 8px;
+            .control-buttons {
+                gap: 10px;
+                padding: 14px 16px;
             }
 
             .btn-play-pause {
@@ -390,7 +395,11 @@
             .btn-stop {
                 width: 36px;
                 height: 36px;
-                margin-top: 12px;
+            }
+
+            .btn-stop svg {
+                width: 14px;
+                height: 14px;
             }
         }
     </style>
@@ -438,11 +447,11 @@
         </div>
         
         <div class="buttons">
-            <div class="skip-controls">
+            <div class="control-buttons">
                 <button id="skipBackBtn" class="skip-btn" title="15秒戻る">
                     <svg viewBox="0 0 24 24">
-                        <path d="M11 12L6 7v10l5-5z"/>
-                        <path d="M18 12L13 7v10l5-5z"/>
+                        <path d="M11 17l-5-5 5-5v10z" fill="#374151"/>
+                        <path d="M18 17l-5-5 5-5v10z" fill="#374151"/>
                     </svg>
                     <span class="skip-text">15</span>
                 </button>
@@ -456,13 +465,11 @@
                 </button>
                 <button id="skipForwardBtn" class="skip-btn" title="15秒進む">
                     <svg viewBox="0 0 24 24">
-                        <path d="M13 12l5-5v10l-5-5z"/>
-                        <path d="M6 12l5-5v10l-5-5z"/>
+                        <path d="M13 7l5 5-5 5V7z" fill="#374151"/>
+                        <path d="M6 7l5 5-5 5V7z" fill="#374151"/>
                     </svg>
                     <span class="skip-text">15</span>
                 </button>
-            </div>
-            <div style="display: flex; justify-content: center; margin-top: 16px;">
                 <button id="stopBtn" class="btn-stop" title="停止">
                     <svg viewBox="0 0 24 24" fill="currentColor">
                         <rect x="6" y="6" width="12" height="12"/>
@@ -592,7 +599,7 @@
             const isHighQuality = highQualityProviders.some(provider =>
                 voice.name.includes(provider) || voice.voiceURI.includes(provider)
             );
-            return isHighQuality ? '⭐' : '';
+            return isHighQuality ? '★' : '';
         }
 
         // 音声リストの読み込み
@@ -610,7 +617,7 @@
             // 日本語音声を追加
             if (jpVoices.length > 0) {
                 const jpGroup = document.createElement('optgroup');
-                jpGroup.label = '🇯🇵 日本語';
+                jpGroup.label = '日本語';
                 jpVoices.forEach((voice, index) => {
                     const option = document.createElement('option');
                     option.value = voices.indexOf(voice);
@@ -623,7 +630,7 @@
             // 英語音声を追加
             if (enVoices.length > 0) {
                 const enGroup = document.createElement('optgroup');
-                enGroup.label = '🇺🇸🇬🇧 English';
+                enGroup.label = 'English';
                 enVoices.forEach((voice, index) => {
                     const option = document.createElement('option');
                     option.value = voices.indexOf(voice);
@@ -636,7 +643,7 @@
             // その他の音声を追加
             if (otherVoices.length > 0) {
                 const otherGroup = document.createElement('optgroup');
-                otherGroup.label = '🌐 その他';
+                otherGroup.label = 'その他';
                 otherVoices.forEach((voice, index) => {
                     const option = document.createElement('option');
                     option.value = voices.indexOf(voice);
@@ -702,7 +709,7 @@
             const text = textInput.value.trim();
             if (text) {
                 const lang = detectLanguage(text);
-                const langName = lang === 'ja' ? '日本語 🇯🇵' : '英語 🇺🇸🇬🇧';
+                const langName = lang === 'ja' ? '日本語' : 'English';
                 detectedLanguage.textContent = langName;
                 languageInfo.style.display = 'block';
             } else {
