@@ -117,6 +117,41 @@
             margin-top: 20px;
             color: #666;
         }
+
+        .language-info {
+            background: #f8f9fa;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-left: 4px solid #667eea;
+        }
+
+        .language-info span {
+            font-weight: bold;
+            color: #333;
+        }
+
+        .voice-quality {
+            color: #ffd700;
+        }
+
+        .pitch-control {
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        .btn-pause {
+            background: #ed8936;
+            color: white;
+        }
+
+        .btn-pause:hover {
+            background: #dd7724;
+        }
+
+        .flag-icon {
+            margin-left: 8px;
+        }
     </style>
 </head>
 <body>
@@ -124,20 +159,30 @@
         <h1>maru-text-to-speech</h1>
         
         <textarea id="textInput" placeholder="読み上げたいテキストを入力してください..."></textarea>
-        
+
+        <div id="languageInfo" class="language-info" style="display: none;">
+            <span>検出言語:</span> <span id="detectedLanguage"></span>
+        </div>
+
         <div class="controls">
             <select id="voiceSelect">
                 <option value="">音声を選択...</option>
             </select>
-            
+
             <div style="width: 100%; margin-top: 10px;">
                 <label>速度: <span id="rateValue">1.0</span>x</label>
                 <input type="range" id="rateRange" min="0.5" max="2" step="0.1" value="1">
+            </div>
+
+            <div class="pitch-control">
+                <label>ピッチ: <span id="pitchValue">1.0</span></label>
+                <input type="range" id="pitchRange" min="0.5" max="2" step="0.1" value="1">
             </div>
         </div>
         
         <div class="buttons">
             <button id="speakBtn" class="btn-speak">読み上げる</button>
+            <button id="pauseBtn" class="btn-pause">一時停止</button>
             <button id="stopBtn" class="btn-stop">停止</button>
         </div>
         
@@ -148,32 +193,152 @@
         // 音声合成の初期化
         const synth = window.speechSynthesis;
         let voices = [];
-        
+        let currentUtterance = null;
+        let isPaused = false;
+
         // DOM要素の取得
         const textInput = document.getElementById('textInput');
         const voiceSelect = document.getElementById('voiceSelect');
         const rateRange = document.getElementById('rateRange');
         const rateValue = document.getElementById('rateValue');
+        const pitchRange = document.getElementById('pitchRange');
+        const pitchValue = document.getElementById('pitchValue');
         const speakBtn = document.getElementById('speakBtn');
+        const pauseBtn = document.getElementById('pauseBtn');
         const stopBtn = document.getElementById('stopBtn');
         const status = document.getElementById('status');
+        const languageInfo = document.getElementById('languageInfo');
+        const detectedLanguage = document.getElementById('detectedLanguage');
         
+        // 言語検出関数
+        function detectLanguage(text) {
+            const japanesePattern = /[\u3040-\u309F\u30A0-\u30FF\u4E00-\u9FAF]/;
+            const englishPattern = /^[a-zA-Z0-9\s.,!?;:"'()\-\[\]{}@#$%^&*+=<>\/\\`~]*$/;
+
+            if (japanesePattern.test(text)) {
+                return 'ja';
+            } else if (englishPattern.test(text.trim())) {
+                return 'en';
+            } else {
+                // 混在または不明な場合は日本語をデフォルト
+                return 'ja';
+            }
+        }
+
+        // 英語テキストの前処理関数
+        function preprocessEnglishText(text) {
+            let processed = text;
+
+            // 略語の展開
+            const abbreviations = {
+                'Mr.': 'Mister',
+                'Mrs.': 'Misses',
+                'Ms.': 'Miss',
+                'Dr.': 'Doctor',
+                'Prof.': 'Professor',
+                'St.': 'Street',
+                'Ave.': 'Avenue',
+                'Blvd.': 'Boulevard',
+                'Inc.': 'Incorporated',
+                'Co.': 'Company',
+                'Ltd.': 'Limited',
+                'etc.': 'etcetera',
+                'vs.': 'versus',
+                'e.g.': 'for example',
+                'i.e.': 'that is',
+                'U.S.': 'United States',
+                'U.K.': 'United Kingdom',
+                'U.S.A.': 'United States of America',
+                'www.': 'W W W dot',
+                '.com': ' dot com',
+                '.org': ' dot org',
+                '.net': ' dot net',
+                '@': ' at '
+            };
+
+            // 略語を展開
+            Object.keys(abbreviations).forEach(abbr => {
+                const regex = new RegExp('\\b' + abbr.replace('.', '\\.'), 'gi');
+                processed = processed.replace(regex, abbreviations[abbr]);
+            });
+
+            // URLとメールアドレスの処理
+            processed = processed.replace(/https?:\/\//gi, 'H T T P ');
+            processed = processed.replace(/\.([a-z]{2,4})\b/gi, ' dot $1');
+
+            // 数字の処理
+            processed = processed.replace(/(\d+)\.(\d+)/g, '$1 point $2');
+
+            // SSMLサポートのチェックと文の区切り改善
+            if (typeof window !== 'undefined' && window.speechSynthesis) {
+                // 単純な間の調整（SSML非対応ブラウザでも動作）
+                processed = processed.replace(/([.!?])\s+/g, '$1... ');
+                processed = processed.replace(/,\s+/g, ', ');
+                processed = processed.replace(/;\s+/g, '; ');
+            }
+
+            return processed;
+        }
+
+        // 高品質音声の判定
+        function getVoiceQuality(voice) {
+            const highQualityProviders = ['Google', 'Microsoft', 'Apple', 'Amazon'];
+            const isHighQuality = highQualityProviders.some(provider =>
+                voice.name.includes(provider) || voice.voiceURI.includes(provider)
+            );
+            return isHighQuality ? '⭐' : '';
+        }
+
         // 音声リストの読み込み
         function loadVoices() {
             voices = synth.getVoices();
             voiceSelect.innerHTML = '<option value="">自動選択</option>';
-            
-            // 日本語音声を優先
-            const jpVoices = voices.filter(voice => voice.lang.includes('ja'));
-            const enVoices = voices.filter(voice => voice.lang.includes('en'));
+
+            // 音声を分類
+            const jpVoices = voices.filter(voice => voice.lang.includes('ja'))
+                .sort((a, b) => getVoiceQuality(b).length - getVoiceQuality(a).length);
+            const enVoices = voices.filter(voice => voice.lang.includes('en'))
+                .sort((a, b) => getVoiceQuality(b).length - getVoiceQuality(a).length);
             const otherVoices = voices.filter(voice => !voice.lang.includes('ja') && !voice.lang.includes('en'));
-            
-            [...jpVoices, ...enVoices, ...otherVoices].forEach((voice, index) => {
-                const option = document.createElement('option');
-                option.value = index;
-                option.textContent = `${voice.name} (${voice.lang})`;
-                voiceSelect.appendChild(option);
-            });
+
+            // 日本語音声を追加
+            if (jpVoices.length > 0) {
+                const jpGroup = document.createElement('optgroup');
+                jpGroup.label = '🇯🇵 日本語';
+                jpVoices.forEach((voice, index) => {
+                    const option = document.createElement('option');
+                    option.value = voices.indexOf(voice);
+                    option.textContent = `${getVoiceQuality(voice)} ${voice.name}`;
+                    jpGroup.appendChild(option);
+                });
+                voiceSelect.appendChild(jpGroup);
+            }
+
+            // 英語音声を追加
+            if (enVoices.length > 0) {
+                const enGroup = document.createElement('optgroup');
+                enGroup.label = '🇺🇸🇬🇧 English';
+                enVoices.forEach((voice, index) => {
+                    const option = document.createElement('option');
+                    option.value = voices.indexOf(voice);
+                    option.textContent = `${getVoiceQuality(voice)} ${voice.name}`;
+                    enGroup.appendChild(option);
+                });
+                voiceSelect.appendChild(enGroup);
+            }
+
+            // その他の音声を追加
+            if (otherVoices.length > 0) {
+                const otherGroup = document.createElement('optgroup');
+                otherGroup.label = '🌐 その他';
+                otherVoices.forEach((voice, index) => {
+                    const option = document.createElement('option');
+                    option.value = voices.indexOf(voice);
+                    option.textContent = `${voice.name} (${voice.lang})`;
+                    otherGroup.appendChild(option);
+                });
+                voiceSelect.appendChild(otherGroup);
+            }
         }
         
         // 初回読み込みと更新時の処理
@@ -182,65 +347,156 @@
         }
         loadVoices();
         
-        // 速度スライダーの更新
+        // スライダーの更新
         rateRange.addEventListener('input', () => {
             rateValue.textContent = rateRange.value;
         });
+
+        pitchRange.addEventListener('input', () => {
+            pitchValue.textContent = pitchRange.value;
+        });
+
+        // テキスト入力時の言語検出
+        textInput.addEventListener('input', () => {
+            const text = textInput.value.trim();
+            if (text) {
+                const lang = detectLanguage(text);
+                const langName = lang === 'ja' ? '日本語 🇯🇵' : '英語 🇺🇸🇬🇧';
+                detectedLanguage.textContent = langName;
+                languageInfo.style.display = 'block';
+            } else {
+                languageInfo.style.display = 'none';
+            }
+        });
         
+        // 最適な音声を自動選択
+        function getOptimalVoice(detectedLang) {
+            let targetVoices;
+            if (detectedLang === 'ja') {
+                targetVoices = voices.filter(voice => voice.lang.includes('ja'));
+            } else {
+                targetVoices = voices.filter(voice => voice.lang.includes('en'));
+            }
+
+            // 高品質音声を優先
+            const highQualityVoices = targetVoices.filter(voice => getVoiceQuality(voice));
+            if (highQualityVoices.length > 0) {
+                return highQualityVoices[0];
+            }
+
+            return targetVoices.length > 0 ? targetVoices[0] : null;
+        }
+
         // 読み上げ機能
         speakBtn.addEventListener('click', () => {
             const text = textInput.value.trim();
-            
+
             if (!text) {
                 status.textContent = 'テキストを入力してください';
                 return;
             }
-            
+
             // 既存の読み上げを停止
             synth.cancel();
-            
-            const utterance = new SpeechSynthesisUtterance(text);
-            
+            isPaused = false;
+            pauseBtn.textContent = '一時停止';
+
+            // 言語検出
+            const detectedLang = detectLanguage(text);
+
+            // テキストの前処理
+            let processedText = text;
+            if (detectedLang === 'en') {
+                processedText = preprocessEnglishText(text);
+            }
+
+            const utterance = new SpeechSynthesisUtterance(processedText);
+            currentUtterance = utterance;
+
             // 音声の選択
             const selectedIndex = voiceSelect.value;
             if (selectedIndex !== '' && voices[selectedIndex]) {
                 utterance.voice = voices[selectedIndex];
+            } else {
+                // 自動選択
+                const optimalVoice = getOptimalVoice(detectedLang);
+                if (optimalVoice) {
+                    utterance.voice = optimalVoice;
+                }
             }
-            
-            // 速度の設定
-            utterance.rate = parseFloat(rateRange.value);
-            
+
+            // 言語別パラメータの最適化
+            if (detectedLang === 'en') {
+                utterance.rate = parseFloat(rateRange.value) * 0.9; // 英語は少し遅めに
+                utterance.pitch = parseFloat(pitchRange.value);
+            } else {
+                utterance.rate = parseFloat(rateRange.value);
+                utterance.pitch = parseFloat(pitchRange.value);
+            }
+
             // イベントハンドラ
             utterance.onstart = () => {
                 status.textContent = '読み上げ中...';
                 speakBtn.disabled = true;
+                pauseBtn.disabled = false;
             };
-            
+
             utterance.onend = () => {
                 status.textContent = '読み上げ完了';
                 speakBtn.disabled = false;
+                pauseBtn.disabled = true;
+                currentUtterance = null;
+                isPaused = false;
+                pauseBtn.textContent = '一時停止';
             };
-            
+
             utterance.onerror = () => {
                 status.textContent = 'エラーが発生しました';
                 speakBtn.disabled = false;
+                pauseBtn.disabled = true;
+                currentUtterance = null;
+                isPaused = false;
+                pauseBtn.textContent = '一時停止';
             };
-            
+
             // 読み上げ開始
             synth.speak(utterance);
         });
         
+        // 一時停止/再開機能
+        pauseBtn.addEventListener('click', () => {
+            if (synth.speaking && !isPaused) {
+                synth.pause();
+                isPaused = true;
+                pauseBtn.textContent = '再開';
+                status.textContent = '一時停止中...';
+            } else if (isPaused) {
+                synth.resume();
+                isPaused = false;
+                pauseBtn.textContent = '一時停止';
+                status.textContent = '読み上げ中...';
+            }
+        });
+
         // 停止機能
         stopBtn.addEventListener('click', () => {
             synth.cancel();
             status.textContent = '停止しました';
             speakBtn.disabled = false;
+            pauseBtn.disabled = true;
+            currentUtterance = null;
+            isPaused = false;
+            pauseBtn.textContent = '一時停止';
         });
         
+        // 初期状態の設定
+        pauseBtn.disabled = true;
+
         // ブラウザ対応チェック
         if (!('speechSynthesis' in window)) {
             alert('お使いのブラウザは音声合成に対応していません');
             speakBtn.disabled = true;
+            pauseBtn.disabled = true;
         }
     </script>
 </body>
