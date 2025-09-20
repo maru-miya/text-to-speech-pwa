@@ -124,20 +124,25 @@
             box-shadow: 0 4px 6px rgba(245, 158, 11, 0.15);
         }
 
-        .btn-play-pause:hover {
+        .btn-play-pause:hover:not(:disabled) {
             background: #3b82f6;
         }
 
-        .btn-play-pause.playing:hover {
+        .btn-play-pause.playing:hover:not(:disabled) {
             background: #d97706;
         }
 
-        .btn-play-pause:active {
+        .btn-play-pause:active:not(:disabled) {
             background: #1d4ed8;
         }
 
-        .btn-play-pause.playing:active {
+        .btn-play-pause.playing:active:not(:disabled) {
             background: #b45309;
+        }
+
+        .btn-play-pause:disabled {
+            opacity: 0.5;
+            cursor: default;
         }
 
         .btn-icon {
@@ -165,14 +170,19 @@
             justify-content: center;
         }
 
-        .btn-stop:hover {
+        .btn-stop:hover:not(:disabled) {
             background: #f9fafb;
             border-color: #d1d5db;
         }
 
+        .btn-stop:disabled {
+            opacity: 0.5;
+            cursor: default;
+        }
+
         button:disabled {
             opacity: 0.5;
-            cursor: not-allowed;
+            cursor: default;
         }
 
         .status {
@@ -330,9 +340,14 @@
             position: relative;
         }
 
-        .skip-btn:hover {
+        .skip-btn:hover:not(:disabled) {
             background: #f9fafb;
             border-color: #d1d5db;
+        }
+
+        .skip-btn:disabled {
+            opacity: 0.5;
+            cursor: default;
         }
 
         .skip-btn svg {
