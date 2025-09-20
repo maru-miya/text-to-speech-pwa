@@ -1,26 +1,25 @@
 // Service Worker for Text-to-Speech PWA
 // オフライン機能とキャッシュ管理を提供
 
-const CACHE_NAME = 'maru-tts-v1.0.0';
-const STATIC_CACHE_NAME = 'maru-tts-static-v1.0.0';
+const CACHE_NAME = 'maru-tts-v1.1.0';
+const STATIC_CACHE_NAME = 'maru-tts-static-v1.1.0';
 
 // キャッシュするリソース
 const STATIC_RESOURCES = [
-  '/',
-  '/index.html',
-  '/styles.css',
-  '/app.js',
-  '/manifest.json',
-  '/icons/icon-144.png',
-  '/icons/icon-192.png',
-  '/icons/icon-512.png'
+  './',
+  './index.html',
+  './styles.css',
+  './manifest.json',
+  './icons/icon-144.png',
+  './icons/icon-192.png',
+  './icons/icon-512.png',
+  './icons/apple-touch-icon-180.png',
+  './icons/favicon-32.png',
+  './icons/favicon.ico'
 ];
 
 // 重要でないリソース（失敗してもアプリが動作する）
-const OPTIONAL_RESOURCES = [
-  '/screenshots/desktop.png',
-  '/screenshots/mobile.png'
-];
+const OPTIONAL_RESOURCES = [];
 
 // Service Worker インストール
 self.addEventListener('install', (event) => {
@@ -29,9 +28,27 @@ self.addEventListener('install', (event) => {
   event.waitUntil(
     Promise.all([
       // 静的リソースのキャッシュ
-      caches.open(STATIC_CACHE_NAME).then((cache) => {
+      caches.open(STATIC_CACHE_NAME).then(async (cache) => {
         console.log('Caching static resources...');
-        return cache.addAll(STATIC_RESOURCES);
+        try {
+          return await cache.addAll(STATIC_RESOURCES);
+        } catch (error) {
+          console.error('Failed to cache some static resources:', error);
+          // 個別にリトライ
+          const failedResources = [];
+          for (const resource of STATIC_RESOURCES) {
+            try {
+              await cache.add(resource);
+              console.log(`Successfully cached: ${resource}`);
+            } catch (e) {
+              console.error(`Failed to cache: ${resource}`, e);
+              failedResources.push(resource);
+            }
+          }
+          if (failedResources.length > 0) {
+            console.warn('Some resources failed to cache:', failedResources);
+          }
+        }
       }),
 
       // オプショナルリソースのキャッシュ（失敗を無視）
