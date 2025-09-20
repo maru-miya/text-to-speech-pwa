@@ -600,6 +600,11 @@
         
         <div id="status" class="status">準備完了</div>
 
+        <!-- デバッグ表示（音声情報） -->
+        <div id="voiceDebugInfo" class="voice-debug-info" style="display: none;">
+            <small style="color: #666; font-size: 12px;">🎤 音声: <span id="selectedVoiceName">未選択</span></small>
+        </div>
+
         <div class="examples-section">
             <h3>試してみよう - Example Phrases</h3>
             <p class="examples-description">クリックして例文を試す - Click to try example phrases</p>
@@ -656,6 +661,14 @@
         let currentSentenceIndex = 0; // 現在の文章インデックス（日本語分割用）
         let allSentences = []; // 分割された全文章（日本語用）
         let isRealTimeChanging = false; // リアルタイム変更中フラグ
+
+        // デバイス判定機能
+        const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+        const isIOS = /iPhone|iPad|iPod/i.test(navigator.userAgent);
+        const isAndroid = /Android/i.test(navigator.userAgent);
+
+        // デバッグ表示用の要素を追加
+        let selectedVoiceInfo = null;
 
         // リアルタイム変更用ユーティリティ関数
         function handleRealtimeParamChange() {
@@ -724,14 +737,11 @@
                 }
             }
 
-            // パラメータ設定
-            if (detectedLang === 'en') {
-                utterance.rate = parseFloat(rateRange.value) * 0.9;
-                utterance.pitch = parseFloat(pitchRange.value);
-            } else {
-                utterance.rate = parseFloat(rateRange.value);
-                utterance.pitch = parseFloat(pitchRange.value);
-            }
+            // パラメータ設定（モバイル対応）
+            const optimizedParams = getMobileOptimizedParams(detectedLang, rateRange.value, pitchRange.value);
+            utterance.rate = optimizedParams.rate;
+            utterance.pitch = optimizedParams.pitch;
+            utterance.volume = optimizedParams.volume;
 
             utterance.onstart = () => {
                 status.textContent = '読み上げ中...';
@@ -843,13 +853,71 @@
 
             // SSMLサポートのチェックと文の区切り改善
             if (typeof window !== 'undefined' && window.speechSynthesis) {
-                // 単純な間の調整（SSML非対応ブラウザでも動作）
-                processed = processed.replace(/([.!?])\s+/g, '$1... ');
-                processed = processed.replace(/,\s+/g, ', ');
-                processed = processed.replace(/;\s+/g, '; ');
+                // モバイル専用の強化処理
+                if (isMobile) {
+                    // スマホではより長い間を追加（自然な読み上げのため）
+                    processed = processed.replace(/([.!?])\s+/g, '$1...... '); // 長めの間
+                    processed = processed.replace(/,\s+/g, ', .. '); // カンマ後に短い間
+                    processed = processed.replace(/;\s+/g, '; ... '); // セミコロン後に間
+                    processed = processed.replace(/:\s+/g, ': .. '); // コロン後に短い間
+
+                    // 長い文を分割（50-70文字で区切り）
+                    processed = splitLongSentencesForMobile(processed);
+                } else {
+                    // PC用の既存処理
+                    processed = processed.replace(/([.!?])\s+/g, '$1... ');
+                    processed = processed.replace(/,\s+/g, ', ');
+                    processed = processed.replace(/;\s+/g, '; ');
+                }
             }
 
             return processed;
+        }
+
+        // スマホ用：長い文章を自然に分割する関数
+        function splitLongSentencesForMobile(text) {
+            const sentences = text.split(/([.!?]+\s*)/);
+            let processedSentences = [];
+
+            for (let i = 0; i < sentences.length; i += 2) {
+                const sentence = sentences[i];
+                const punctuation = sentences[i + 1] || '';
+
+                if (sentence && sentence.length > 70) {
+                    // 長い文を分割
+                    const parts = [];
+                    let currentPart = '';
+                    const words = sentence.split(' ');
+
+                    for (const word of words) {
+                        if (currentPart.length + word.length + 1 <= 60) {
+                            currentPart += (currentPart ? ' ' : '') + word;
+                        } else {
+                            if (currentPart) {
+                                parts.push(currentPart + ',');
+                                currentPart = word;
+                            } else {
+                                parts.push(word);
+                            }
+                        }
+                    }
+
+                    if (currentPart) {
+                        parts.push(currentPart);
+                    }
+
+                    // 最後の部分に句読点を追加
+                    if (parts.length > 0) {
+                        parts[parts.length - 1] += punctuation;
+                    }
+
+                    processedSentences.push(parts.join(' ... '));
+                } else {
+                    processedSentences.push(sentence + punctuation);
+                }
+            }
+
+            return processedSentences.join(' ');
         }
 
         // 日本語テキストの前処理関数
@@ -1048,6 +1116,150 @@
             }
         });
         
+        // スマホ専用の英語音声選択機能
+        function getMobileOptimalEnglishVoice() {
+            let englishVoices = voices.filter(voice =>
+                voice.lang.includes('en') || voice.lang.toLowerCase().includes('english')
+            );
+
+            // モバイルでない場合は既存のロジックを使用
+            if (!isMobile) {
+                const highQualityVoices = englishVoices.filter(voice => getVoiceQuality(voice));
+                return highQualityVoices.length > 0 ? highQualityVoices[0] : (englishVoices.length > 0 ? englishVoices[0] : null);
+            }
+
+            let selectedVoice = null;
+
+            if (isIOS) {
+                // iOS専用の音声優先順位
+                const iosPriorities = [
+                    'Samantha',     // Siri女性音声
+                    'Alex',         // 男性音声
+                    'Daniel',       // イギリス英語
+                    'Karen',        // オーストラリア英語
+                    'Moira'         // アイルランド英語
+                ];
+
+                // 優先順位に基づいて検索
+                for (const priority of iosPriorities) {
+                    selectedVoice = englishVoices.find(voice =>
+                        voice.name.toLowerCase().includes(priority.toLowerCase()) ||
+                        voice.voiceURI.toLowerCase().includes(priority.toLowerCase())
+                    );
+                    if (selectedVoice) break;
+                }
+
+                // 見つからない場合、com.appleを含む音声を探す
+                if (!selectedVoice) {
+                    selectedVoice = englishVoices.find(voice =>
+                        voice.voiceURI.includes('com.apple') || voice.name.includes('Apple')
+                    );
+                }
+            } else if (isAndroid) {
+                // Android専用の音声優先順位
+                const androidPriorities = [
+                    'Google US English',
+                    'Google UK English',
+                    'Samsung'
+                ];
+
+                // 優先順位に基づいて検索
+                for (const priority of androidPriorities) {
+                    selectedVoice = englishVoices.find(voice =>
+                        voice.name.includes(priority) || voice.voiceURI.includes(priority)
+                    );
+                    if (selectedVoice) break;
+                }
+
+                // 見つからない場合、Googleまたは名前にEnglishを含む音声を探す
+                if (!selectedVoice) {
+                    selectedVoice = englishVoices.find(voice =>
+                        voice.name.includes('Google') && voice.name.includes('English')
+                    );
+                }
+
+                if (!selectedVoice) {
+                    selectedVoice = englishVoices.find(voice =>
+                        voice.name.toLowerCase().includes('english')
+                    );
+                }
+            }
+
+            // 音声が見つからない場合の対策
+            if (!selectedVoice) {
+                // en-USからenに変更して再試行
+                englishVoices = voices.filter(voice => voice.lang === 'en');
+                selectedVoice = englishVoices.length > 0 ? englishVoices[0] : null;
+            }
+
+            // まだ見つからない場合、localServiceがfalseの音声（オンライン音声）を試す
+            if (!selectedVoice) {
+                const onlineVoices = voices.filter(voice =>
+                    (voice.lang.includes('en') || voice.lang.toLowerCase().includes('english')) &&
+                    voice.localService === false
+                );
+                selectedVoice = onlineVoices.length > 0 ? onlineVoices[0] : null;
+            }
+
+            // デバッグ情報を更新
+            updateVoiceDebugInfo(selectedVoice);
+
+            return selectedVoice || (englishVoices.length > 0 ? englishVoices[0] : null);
+        }
+
+        // 音声選択のデバッグ情報を更新
+        function updateVoiceDebugInfo(voice) {
+            const debugInfo = document.getElementById('voiceDebugInfo');
+            const voiceName = document.getElementById('selectedVoiceName');
+
+            if (voice && debugInfo && voiceName) {
+                let deviceInfo = '';
+                if (isIOS) deviceInfo = 'iOS';
+                else if (isAndroid) deviceInfo = 'Android';
+                else if (isMobile) deviceInfo = 'Mobile';
+                else deviceInfo = 'PC';
+
+                voiceName.textContent = `${voice.name} (${deviceInfo})`;
+                debugInfo.style.display = 'block';
+            }
+        }
+
+        // スマホ専用の読み上げパラメータを取得
+        function getMobileOptimizedParams(detectedLang, baseRate, basePitch) {
+            if (!isMobile) {
+                // PCの場合は既存のロジック
+                if (detectedLang === 'en') {
+                    return {
+                        rate: parseFloat(baseRate) * 0.9,
+                        pitch: parseFloat(basePitch),
+                        volume: 1.0
+                    };
+                } else {
+                    return {
+                        rate: parseFloat(baseRate),
+                        pitch: parseFloat(basePitch),
+                        volume: 1.0
+                    };
+                }
+            }
+
+            // スマホ専用の設定
+            if (detectedLang === 'en') {
+                return {
+                    rate: 0.9,  // スマホの英語は固定で少し遅め
+                    pitch: 1.0, // 自然なピッチ
+                    volume: 1.0
+                };
+            } else {
+                // 日本語などの他の言語
+                return {
+                    rate: parseFloat(baseRate),
+                    pitch: parseFloat(basePitch),
+                    volume: 1.0
+                };
+            }
+        }
+
         // 最適な音声を自動選択
         function getOptimalVoice(detectedLang) {
             let targetVoices;
@@ -1072,6 +1284,8 @@
                         return preferredVoice;
                     }
                 }
+            } else if (detectedLang === 'en') {
+                return getMobileOptimalEnglishVoice();
             } else {
                 targetVoices = voices.filter(voice => voice.lang.includes('en'));
 
@@ -1183,14 +1397,11 @@
                 }
             }
 
-            // 言語別パラメータの最適化
-            if (detectedLang === 'en') {
-                utterance.rate = parseFloat(rateRange.value) * 0.9; // 英語は少し遅めに
-                utterance.pitch = parseFloat(pitchRange.value);
-            } else {
-                utterance.rate = parseFloat(rateRange.value);
-                utterance.pitch = parseFloat(pitchRange.value);
-            }
+            // 言語別パラメータの最適化（モバイル対応）
+            const optimizedParams = getMobileOptimizedParams(detectedLang, rateRange.value, pitchRange.value);
+            utterance.rate = optimizedParams.rate;
+            utterance.pitch = optimizedParams.pitch;
+            utterance.volume = optimizedParams.volume;
 
         // 日本語文章分割読み上げ機能
         function speakJapaneseWithPauses(text) {
