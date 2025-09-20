@@ -31,175 +31,156 @@
             font-weight: 600;
         }
         #download:hover { background: #0051D5; }
+        #svgDisplay {
+            border: 1px solid #ddd;
+            border-radius: 8px;
+            width: 200px;
+            height: 200px;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>maru-text-to-speech App Icon</h1>
-        <p>512x512 - High resolution Apple-style design with history feature indication</p>
+        <h1>Maru-Text-to-Speech App Icon</h1>
+        <p>512x512 - Apple-style design with history feature indication</p>
 
+        <div id="svgDisplay"></div>
         <canvas id="canvas" width="512" height="512"></canvas>
         <a id="download" download="icon-512.png">Download icon-512.png</a>
     </div>
 
     <script>
-        const canvas = document.getElementById('canvas');
-        const ctx = canvas.getContext('2d');
-        const size = 512;
+        async function loadSVGAndGenerateIcon() {
+            try {
+                // Load the SVG file
+                const response = await fetch('./icon-512.svg');
+                const svgText = await response.text();
 
-        // iOS rounded rectangle background
-        const cornerRadius = size * 0.22; // iOS standard 22.37%
+                // Display SVG
+                document.getElementById('svgDisplay').innerHTML = svgText;
 
-        // Background gradient - sophisticated blue with depth
-        const bgGradient = ctx.createLinearGradient(0, 0, size, size);
-        bgGradient.addColorStop(0, '#4A90E2');
-        bgGradient.addColorStop(0.3, '#357ABD');
-        bgGradient.addColorStop(0.7, '#2E6BA8');
-        bgGradient.addColorStop(1, '#1F4788');
+                // Create image from SVG
+                const img = new Image();
+                const svgBlob = new Blob([svgText], { type: 'image/svg+xml;charset=utf-8' });
+                const url = URL.createObjectURL(svgBlob);
 
-        // Draw rounded rectangle background
-        ctx.fillStyle = bgGradient;
-        ctx.beginPath();
-        ctx.roundRect(0, 0, size, size, cornerRadius);
-        ctx.fill();
+                img.onload = function() {
+                    const canvas = document.getElementById('canvas');
+                    const ctx = canvas.getContext('2d');
 
-        // Add highlight gradient for depth
-        const highlightGradient = ctx.createLinearGradient(0, 0, size, size * 0.5);
-        highlightGradient.addColorStop(0, 'rgba(255,255,255,0.3)');
-        highlightGradient.addColorStop(1, 'rgba(255,255,255,0)');
+                    // Clear canvas
+                    ctx.clearRect(0, 0, 512, 512);
 
-        ctx.fillStyle = highlightGradient;
-        ctx.beginPath();
-        ctx.roundRect(0, 0, size, size * 0.5, cornerRadius);
-        ctx.fill();
+                    // Draw SVG to canvas
+                    ctx.drawImage(img, 0, 0, 512, 512);
 
-        // Constants for positioning
-        const centerX = size / 2;
-        const centerY = size / 2;
-        const scale = size / 144;
+                    // Setup download
+                    canvas.toBlob(function(blob) {
+                        const downloadUrl = URL.createObjectURL(blob);
+                        document.getElementById('download').href = downloadUrl;
+                    }, 'image/png');
 
-        // Main microphone design
-        const micGradient = ctx.createLinearGradient(0, centerY - 30*scale, 0, centerY + 30*scale);
-        micGradient.addColorStop(0, '#FFFFFF');
-        micGradient.addColorStop(1, '#F0F4F8');
+                    // Clean up
+                    URL.revokeObjectURL(url);
+                };
 
-        // Microphone body with shadow
-        ctx.shadowColor = 'rgba(0,0,0,0.25)';
-        ctx.shadowBlur = 12 * scale;
-        ctx.shadowOffsetY = 6 * scale;
+                img.src = url;
 
-        ctx.fillStyle = micGradient;
-        ctx.beginPath();
-        ctx.roundRect(centerX - 14*scale, centerY - 21*scale, 28*scale, 42*scale, 14*scale);
-        ctx.fill();
+            } catch (error) {
+                console.error('Error loading SVG:', error);
 
-        // Microphone stand
-        ctx.shadowBlur = 6 * scale;
-        ctx.fillRect(centerX - 2*scale, centerY + 21*scale, 4*scale, 20*scale);
+                // Fallback to manual drawing if SVG loading fails
+                drawFallbackIcon();
+            }
+        }
 
-        // Microphone base
-        ctx.beginPath();
-        ctx.roundRect(centerX - 10*scale, centerY + 41*scale, 20*scale, 6*scale, 3*scale);
-        ctx.fill();
+        function drawFallbackIcon() {
+            const canvas = document.getElementById('canvas');
+            const ctx = canvas.getContext('2d');
+            const size = 512;
 
-        // Reset shadow
-        ctx.shadowColor = 'transparent';
-        ctx.shadowBlur = 0;
-        ctx.shadowOffsetY = 0;
+            // Background gradient
+            const bgGradient = ctx.createLinearGradient(0, 0, size, size);
+            bgGradient.addColorStop(0, '#4f46e5');
+            bgGradient.addColorStop(0.35, '#3b82f6');
+            bgGradient.addColorStop(1, '#06b6d4');
 
-        // History indicator circle (top right) - larger for 512px
-        const historyX = size - 128*scale;
-        const historyY = 128*scale;
-        const historyRadius = 42*scale;
+            // Draw rounded rectangle background
+            const cornerRadius = 114;
+            ctx.fillStyle = bgGradient;
+            ctx.beginPath();
+            ctx.roundRect(0, 0, size, size, cornerRadius);
+            ctx.fill();
 
-        const historyGradient = ctx.createLinearGradient(
-            historyX - historyRadius, historyY - historyRadius,
-            historyX + historyRadius, historyY + historyRadius
-        );
-        historyGradient.addColorStop(0, '#FF8A50');
-        historyGradient.addColorStop(1, '#FF6B35');
+            // Inner glow
+            const innerGradient = ctx.createLinearGradient(size*0.2, size*0.2, size*0.8, size*0.8);
+            innerGradient.addColorStop(0, 'rgba(255,255,255,0.25)');
+            innerGradient.addColorStop(1, 'rgba(255,255,255,0.05)');
 
-        ctx.shadowColor = 'rgba(0,0,0,0.3)';
-        ctx.shadowBlur = 12 * scale;
-        ctx.shadowOffsetY = 6 * scale;
+            ctx.fillStyle = innerGradient;
+            ctx.beginPath();
+            ctx.roundRect(0, 0, size, size, cornerRadius);
+            ctx.fill();
 
-        ctx.fillStyle = historyGradient;
-        ctx.beginPath();
-        ctx.arc(historyX, historyY, historyRadius, 0, 2 * Math.PI);
-        ctx.fill();
+            // Microphone
+            const centerX = 256;
+            const centerY = 256;
 
-        // Clock icon inside history circle
-        ctx.shadowColor = 'transparent';
-        ctx.shadowBlur = 0;
-        ctx.shadowOffsetY = 0;
+            // Microphone gradient
+            const micGradient = ctx.createLinearGradient(centerX-32, centerY-45, centerX+32, centerY+45);
+            micGradient.addColorStop(0, '#ffffff');
+            micGradient.addColorStop(1, '#f1f5f9');
 
-        // Clock face
-        ctx.fillStyle = 'rgba(255,255,255,0.95)';
-        ctx.beginPath();
-        ctx.arc(historyX, historyY, 28*scale, 0, 2 * Math.PI);
-        ctx.fill();
+            // Microphone capsule
+            ctx.fillStyle = micGradient;
+            ctx.strokeStyle = 'rgba(255,255,255,0.8)';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.ellipse(centerX, centerY-45, 32, 45, 0, 0, 2 * Math.PI);
+            ctx.fill();
+            ctx.stroke();
 
-        // Clock hands
-        ctx.strokeStyle = '#1F4788';
-        ctx.lineCap = 'round';
+            // Microphone handle
+            ctx.fillRect(centerX-4, centerY, 8, 48);
 
-        // Hour hand
-        ctx.lineWidth = 6 * scale;
-        ctx.beginPath();
-        ctx.moveTo(historyX, historyY);
-        ctx.lineTo(historyX, historyY - 14*scale);
-        ctx.stroke();
+            // Microphone base
+            ctx.beginPath();
+            ctx.ellipse(centerX, centerY+48, 24, 8, 0, 0, 2 * Math.PI);
+            ctx.fill();
+            ctx.stroke();
 
-        // Minute hand
-        ctx.lineWidth = 4 * scale;
-        ctx.beginPath();
-        ctx.moveTo(historyX, historyY);
-        ctx.lineTo(historyX + 10*scale, historyY);
-        ctx.stroke();
+            // History book (upper right)
+            const bookX = 380;
+            const bookY = 140;
 
-        // Center dot
-        ctx.fillStyle = '#1F4788';
-        ctx.beginPath();
-        ctx.arc(historyX, historyY, 4*scale, 0, 2 * Math.PI);
-        ctx.fill();
+            // Book gradient
+            const bookGradient = ctx.createLinearGradient(bookX, bookY, bookX+64, bookY+80);
+            bookGradient.addColorStop(0, '#fbbf24');
+            bookGradient.addColorStop(1, '#f59e0b');
 
-        // Sound waves emanating from microphone
-        ctx.strokeStyle = 'rgba(255,255,255,0.8)';
-        ctx.lineWidth = 8 * scale;
-        ctx.lineCap = 'round';
+            ctx.fillStyle = bookGradient;
+            ctx.strokeStyle = 'rgba(255,255,255,0.9)';
+            ctx.lineWidth = 2;
+            ctx.beginPath();
+            ctx.roundRect(bookX, bookY, 64, 80, 8);
+            ctx.fill();
+            ctx.stroke();
 
-        // Wave 1
-        ctx.globalAlpha = 0.8;
-        ctx.beginPath();
-        ctx.arc(centerX + 14*scale, centerY, 55*scale, -Math.PI/3, Math.PI/3, false);
-        ctx.stroke();
+            // Book pages
+            ctx.fillStyle = 'rgba(255,255,255,0.95)';
+            ctx.beginPath();
+            ctx.roundRect(bookX+6, bookY+6, 52, 68, 4);
+            ctx.fill();
 
-        // Wave 2
-        ctx.globalAlpha = 0.6;
-        ctx.beginPath();
-        ctx.arc(centerX + 14*scale, centerY, 88*scale, -Math.PI/4, Math.PI/4, false);
-        ctx.stroke();
+            // Setup download
+            canvas.toBlob(function(blob) {
+                const url = URL.createObjectURL(blob);
+                document.getElementById('download').href = url;
+            }, 'image/png');
+        }
 
-        // Wave 3
-        ctx.globalAlpha = 0.4;
-        ctx.beginPath();
-        ctx.arc(centerX + 14*scale, centerY, 122*scale, -Math.PI/6, Math.PI/6, false);
-        ctx.stroke();
-
-        ctx.globalAlpha = 1;
-
-        // Subtle inner border for polish
-        ctx.strokeStyle = 'rgba(255,255,255,0.1)';
-        ctx.lineWidth = 2;
-        ctx.beginPath();
-        ctx.roundRect(2, 2, size-4, size-4, cornerRadius-2);
-        ctx.stroke();
-
-        // Setup download
-        canvas.toBlob(function(blob) {
-            const url = URL.createObjectURL(blob);
-            document.getElementById('download').href = url;
-        });
+        // Load SVG when page loads
+        loadSVGAndGenerateIcon();
     </script>
 </body>
 </html>

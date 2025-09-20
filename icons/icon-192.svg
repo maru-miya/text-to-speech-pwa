@@ -1,44 +1,99 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <svg width="192" height="192" viewBox="0 0 192 192" xmlns="http://www.w3.org/2000/svg">
   <defs>
+    <!-- Main background gradient with Apple-style sophistication -->
     <linearGradient id="bg-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
-      <stop offset="0%" style="stop-color:#2563eb;stop-opacity:1" />
-      <stop offset="100%" style="stop-color:#3b82f6;stop-opacity:1" />
+      <stop offset="0%" style="stop-color:#4f46e5;stop-opacity:1" />
+      <stop offset="35%" style="stop-color:#3b82f6;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#06b6d4;stop-opacity:1" />
+    </linearGradient>
+
+    <!-- Subtle inner gradient for depth -->
+    <linearGradient id="inner-gradient" x1="20%" y1="20%" x2="80%" y2="80%">
+      <stop offset="0%" style="stop-color:rgba(255,255,255,0.25);stop-opacity:1" />
+      <stop offset="100%" style="stop-color:rgba(255,255,255,0.05);stop-opacity:1" />
+    </linearGradient>
+
+    <!-- Microphone gradient -->
+    <linearGradient id="mic-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#ffffff;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#f1f5f9;stop-opacity:1" />
+    </linearGradient>
+
+    <!-- History book gradient -->
+    <linearGradient id="book-gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#fbbf24;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#f59e0b;stop-opacity:1" />
     </linearGradient>
   </defs>
 
-  <!-- Background with rounded corners -->
-  <rect x="0" y="0" width="192" height="192" rx="38" ry="38" fill="url(#bg-gradient)"/>
+  <!-- Background with golden ratio rounded corners -->
+  <rect x="0" y="0" width="192" height="192" rx="43" ry="43" fill="url(#bg-gradient)"/>
 
-  <!-- Microphone body -->
-  <rect x="82" y="48" width="28" height="44" rx="14" ry="14" fill="white"/>
+  <!-- Subtle inner glow -->
+  <rect x="0" y="0" width="192" height="192" rx="43" ry="43" fill="url(#inner-gradient)"/>
 
-  <!-- Microphone handle -->
-  <rect x="94" y="92" width="4" height="24" fill="white"/>
+  <!-- Main content group -->
+  <g>
+    <!-- Central microphone element -->
+    <g transform="translate(96, 96)">
+      <!-- Microphone capsule -->
+      <ellipse cx="0" cy="-17" rx="12" ry="17" fill="url(#mic-gradient)" stroke="rgba(255,255,255,0.8)" stroke-width="1"/>
 
-  <!-- Microphone base -->
-  <rect x="86" y="116" width="20" height="6" rx="3" ry="3" fill="white"/>
+      <!-- Microphone handle -->
+      <rect x="-1.5" y="0" width="3" height="18" rx="1.5" fill="url(#mic-gradient)" stroke="rgba(255,255,255,0.8)" stroke-width="0.5"/>
 
-  <!-- Sound waves -->
-  <g stroke="white" stroke-width="3" fill="none">
-    <!-- Wave 1 (closest) -->
-    <path d="M 116 64 Q 128 72 128 88 Q 128 104 116 112"/>
-    <!-- Wave 2 (middle) -->
-    <path d="M 124 56 Q 140 68 140 88 Q 140 108 124 120"/>
-    <!-- Wave 3 (farthest) -->
-    <path d="M 132 48 Q 152 64 152 88 Q 152 112 132 128"/>
+      <!-- Microphone base -->
+      <ellipse cx="0" cy="18" rx="9" ry="3" fill="url(#mic-gradient)" stroke="rgba(255,255,255,0.8)" stroke-width="0.5"/>
+    </g>
+
+    <!-- Sound waves -->
+    <g stroke="rgba(255,255,255,0.9)" stroke-width="2" fill="none" opacity="0.8">
+      <!-- Wave 1 (closest) -->
+      <path d="M 120 70 Q 133 79 133 96 Q 133 113 120 122" stroke-linecap="round"/>
+      <!-- Wave 2 (middle) -->
+      <path d="M 127 63 Q 144 75 144 96 Q 144 117 127 129" stroke-linecap="round"/>
+      <!-- Wave 3 (farthest) -->
+      <path d="M 135 55 Q 155 70 155 96 Q 155 122 135 137" stroke-linecap="round"/>
+    </g>
+
+    <!-- History book element -->
+    <g transform="translate(142, 52)">
+      <!-- Book cover -->
+      <rect x="0" y="0" width="24" height="30" rx="3" ry="3" fill="url(#book-gradient)" stroke="rgba(255,255,255,0.9)" stroke-width="1"/>
+
+      <!-- Book pages -->
+      <rect x="2" y="2" width="20" height="26" rx="1.5" ry="1.5" fill="rgba(255,255,255,0.95)"/>
+
+      <!-- Text lines -->
+      <g stroke="#64748b" stroke-width="0.8" stroke-linecap="round" opacity="0.7">
+        <line x1="5" y1="8" x2="17" y2="8"/>
+        <line x1="5" y1="12" x2="15" y2="12"/>
+        <line x1="5" y1="16" x2="16" y2="16"/>
+        <line x1="5" y1="20" x2="14" y2="20"/>
+        <line x1="5" y1="24" x2="16" y2="24"/>
+      </g>
+
+      <!-- Small bookmark -->
+      <rect x="19" y="0" width="3" height="9" fill="#ef4444" rx="1"/>
+    </g>
+
+    <!-- Clock element -->
+    <g transform="translate(37, 135)" opacity="0.7">
+      <!-- Clock face -->
+      <circle cx="0" cy="0" r="10" fill="rgba(255,255,255,0.9)" stroke="rgba(255,255,255,0.95)" stroke-width="1"/>
+
+      <!-- Clock hands -->
+      <g stroke="#374151" stroke-width="1" stroke-linecap="round">
+        <line x1="0" y1="0" x2="0" y2="-6"/>
+        <line x1="0" y1="0" x2="4" y2="-3"/>
+      </g>
+
+      <!-- Center dot -->
+      <circle cx="0" cy="0" r="1" fill="#374151"/>
+    </g>
+
+    <!-- Subtle highlight -->
+    <ellipse cx="96" cy="45" rx="60" ry="11" fill="rgba(255,255,255,0.12)" opacity="0.8"/>
   </g>
-
-  <!-- Sound wave dots for visual appeal -->
-  <circle cx="120" cy="76" r="2" fill="white" opacity="0.7"/>
-  <circle cx="120" cy="88" r="2" fill="white" opacity="0.9"/>
-  <circle cx="120" cy="100" r="2" fill="white" opacity="0.7"/>
-
-  <circle cx="132" cy="72" r="1.5" fill="white" opacity="0.6"/>
-  <circle cx="132" cy="88" r="1.5" fill="white" opacity="0.8"/>
-  <circle cx="132" cy="104" r="1.5" fill="white" opacity="0.6"/>
-
-  <circle cx="144" cy="68" r="1" fill="white" opacity="0.5"/>
-  <circle cx="144" cy="88" r="1" fill="white" opacity="0.7"/>
-  <circle cx="144" cy="108" r="1" fill="white" opacity="0.5"/>
 </svg>
