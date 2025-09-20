@@ -14,7 +14,7 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            background: #f8f9fa;
             min-height: 100vh;
             padding: 20px;
             display: flex;
@@ -24,17 +24,19 @@
 
         .container {
             background: white;
-            border-radius: 20px;
+            border-radius: 16px;
             padding: 40px;
             max-width: 600px;
             width: 100%;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            border: 1px solid #e0e0e0;
         }
 
         h1 {
-            color: #333;
+            color: #333333;
             margin-bottom: 30px;
             text-align: center;
+            font-weight: 600;
         }
 
         textarea {
@@ -50,7 +52,7 @@
 
         textarea:focus {
             outline: none;
-            border-color: #667eea;
+            border-color: #4a90e2;
         }
 
         .controls {
@@ -71,7 +73,7 @@
 
         select:focus {
             outline: none;
-            border-color: #667eea;
+            border-color: #4a90e2;
         }
 
         .buttons {
@@ -90,12 +92,14 @@
         }
 
         .btn-speak {
-            background: #667eea;
+            background: #4a90e2;
             color: white;
         }
 
         .btn-speak:hover {
-            background: #5a67d8;
+            background: #357abd;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(74, 144, 226, 0.3);
         }
 
         .btn-stop {
@@ -123,7 +127,7 @@
             border-radius: 8px;
             padding: 15px;
             margin-bottom: 20px;
-            border-left: 4px solid #667eea;
+            border-left: 4px solid #4a90e2;
         }
 
         .language-info span {
@@ -152,6 +156,50 @@
         .flag-icon {
             margin-left: 8px;
         }
+
+        .preset-buttons {
+            display: flex;
+            gap: 8px;
+            margin-top: 8px;
+            flex-wrap: wrap;
+        }
+
+        .preset-btn {
+            padding: 6px 12px;
+            border: 1px solid #e0e0e0;
+            border-radius: 20px;
+            background: white;
+            color: #333333;
+            font-size: 14px;
+            cursor: pointer;
+            transition: all 0.2s;
+            min-width: 44px;
+            text-align: center;
+        }
+
+        .preset-btn:hover {
+            background: #f8f9fa;
+            border-color: #4a90e2;
+            transform: translateY(-1px);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+
+        .preset-btn.active {
+            background: #4a90e2;
+            color: white;
+            border-color: #4a90e2;
+        }
+
+        .control-group {
+            margin-bottom: 20px;
+        }
+
+        .control-label {
+            font-weight: 500;
+            color: #333333;
+            margin-bottom: 8px;
+            display: block;
+        }
     </style>
 </head>
 <body>
@@ -169,14 +217,30 @@
                 <option value="">音声を選択...</option>
             </select>
 
-            <div style="width: 100%; margin-top: 10px;">
-                <label>速度: <span id="rateValue">1.0</span>x</label>
+            <div class="control-group">
+                <label class="control-label">速度: <span id="rateValue">1.0</span>x</label>
                 <input type="range" id="rateRange" min="0.5" max="2" step="0.1" value="1">
+                <div class="preset-buttons">
+                    <button class="preset-btn" data-rate="0.75">0.75x</button>
+                    <button class="preset-btn active" data-rate="1.0">1.0x</button>
+                    <button class="preset-btn" data-rate="1.25">1.25x</button>
+                    <button class="preset-btn" data-rate="1.5">1.5x</button>
+                    <button class="preset-btn" data-rate="1.75">1.75x</button>
+                    <button class="preset-btn" data-rate="2.0">2.0x</button>
+                </div>
             </div>
 
-            <div class="pitch-control">
-                <label>ピッチ: <span id="pitchValue">1.0</span></label>
+            <div class="control-group">
+                <label class="control-label">ピッチ: <span id="pitchValue">1.0</span></label>
                 <input type="range" id="pitchRange" min="0.5" max="2" step="0.1" value="1">
+                <div class="preset-buttons">
+                    <button class="preset-btn" data-pitch="0.75">0.75</button>
+                    <button class="preset-btn active" data-pitch="1.0">1.0</button>
+                    <button class="preset-btn" data-pitch="1.25">1.25</button>
+                    <button class="preset-btn" data-pitch="1.5">1.5</button>
+                    <button class="preset-btn" data-pitch="1.75">1.75</button>
+                    <button class="preset-btn" data-pitch="2.0">2.0</button>
+                </div>
             </div>
         </div>
         
@@ -350,10 +414,45 @@
         // スライダーの更新
         rateRange.addEventListener('input', () => {
             rateValue.textContent = rateRange.value;
+            updateActivePresetBtn('rate', rateRange.value);
         });
 
         pitchRange.addEventListener('input', () => {
             pitchValue.textContent = pitchRange.value;
+            updateActivePresetBtn('pitch', pitchRange.value);
+        });
+
+        // プリセットボタンの機能
+        function updateActivePresetBtn(type, value) {
+            const buttons = document.querySelectorAll(`[data-${type}]`);
+            buttons.forEach(btn => {
+                const btnValue = parseFloat(btn.getAttribute(`data-${type}`));
+                if (Math.abs(btnValue - parseFloat(value)) < 0.01) {
+                    btn.classList.add('active');
+                } else {
+                    btn.classList.remove('active');
+                }
+            });
+        }
+
+        // 速度プリセットボタンのイベントリスナー
+        document.querySelectorAll('[data-rate]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const rate = btn.getAttribute('data-rate');
+                rateRange.value = rate;
+                rateValue.textContent = rate;
+                updateActivePresetBtn('rate', rate);
+            });
+        });
+
+        // ピッチプリセットボタンのイベントリスナー
+        document.querySelectorAll('[data-pitch]').forEach(btn => {
+            btn.addEventListener('click', () => {
+                const pitch = btn.getAttribute('data-pitch');
+                pitchRange.value = pitch;
+                pitchValue.textContent = pitch;
+                updateActivePresetBtn('pitch', pitch);
+            });
         });
 
         // テキスト入力時の言語検出
