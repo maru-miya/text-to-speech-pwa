@@ -522,11 +522,284 @@
                 margin-top: 24px;
             }
         }
+
+        /* 履歴機能のスタイル */
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+        }
+
+        .history-btn {
+            padding: 0.5rem 1rem;
+            background: #3B82F6;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 0.3rem;
+        }
+
+        .history-btn:hover {
+            background: #2563EB;
+            transform: translateY(-1px);
+        }
+
+        .history-btn:active {
+            transform: translateY(0);
+        }
+
+        /* 履歴モーダル */
+        .history-modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5);
+            z-index: 1000;
+            backdrop-filter: blur(4px);
+        }
+
+        .history-modal-content {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.2);
+            width: 90%;
+            max-width: 600px;
+            max-height: 80vh;
+            overflow: hidden;
+        }
+
+        .history-modal-header {
+            padding: 1.5rem;
+            border-bottom: 1px solid #e5e7eb;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .history-modal-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #374151;
+            margin: 0;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            font-size: 1.5rem;
+            cursor: pointer;
+            color: #6b7280;
+            padding: 0;
+            width: 2rem;
+            height: 2rem;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+        }
+
+        .close-btn:hover {
+            background: #f3f4f6;
+            color: #374151;
+        }
+
+        .history-modal-body {
+            padding: 1.5rem;
+            max-height: 60vh;
+            overflow-y: auto;
+        }
+
+        .history-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .history-item {
+            padding: 1rem;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            margin-bottom: 0.5rem;
+            transition: all 0.2s ease;
+        }
+
+        .history-item:hover {
+            background: #f9fafb;
+            border-color: #d1d5db;
+        }
+
+        .history-item-text {
+            font-size: 0.9rem;
+            color: #374151;
+            margin-bottom: 0.5rem;
+            line-height: 1.4;
+        }
+
+        .history-item-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 0.8rem;
+            color: #6b7280;
+            margin-bottom: 0.75rem;
+        }
+
+        .history-item-actions {
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .practice-btn, .delete-btn {
+            padding: 0.25rem 0.75rem;
+            font-size: 0.8rem;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .practice-btn {
+            background: #3B82F6;
+            color: white;
+        }
+
+        .practice-btn:hover {
+            background: #2563EB;
+        }
+
+        .delete-btn {
+            background: #ef4444;
+            color: white;
+        }
+
+        .delete-btn:hover {
+            background: #dc2626;
+        }
+
+        .clear-all-btn {
+            width: 100%;
+            padding: 0.75rem;
+            background: #6b7280;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 0.9rem;
+            cursor: pointer;
+            margin-top: 1rem;
+        }
+
+        .clear-all-btn:hover {
+            background: #4b5563;
+        }
+
+        .history-empty {
+            text-align: center;
+            padding: 2rem;
+            color: #6b7280;
+        }
+
+        .history-empty-sub {
+            font-size: 0.9rem;
+            margin-top: 0.5rem;
+            opacity: 0.7;
+        }
+
+        .history-item-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 0.5rem;
+        }
+
+        .history-item-lang {
+            font-size: 0.8rem;
+            font-weight: bold;
+            color: #3B82F6;
+        }
+
+        .history-item-date {
+            font-size: 0.75rem;
+            color: #6b7280;
+        }
+
+        .history-item-params {
+            font-size: 0.75rem;
+            color: #6b7280;
+            margin: 0.5rem 0;
+        }
+
+        .history-practice-btn, .history-delete-btn {
+            padding: 0.25rem 0.75rem;
+            font-size: 0.8rem;
+            border-radius: 6px;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .history-practice-btn {
+            background: #3B82F6;
+            color: white;
+        }
+
+        .history-practice-btn:hover {
+            background: #2563EB;
+        }
+
+        .history-delete-btn {
+            background: #ef4444;
+            color: white;
+        }
+
+        .history-delete-btn:hover {
+            background: #dc2626;
+        }
+
+        .empty-history {
+            text-align: center;
+            color: #6b7280;
+            padding: 3rem 1rem;
+        }
+
+        .empty-history-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .empty-history-text {
+            font-size: 1.1rem;
+            margin-bottom: 0.5rem;
+        }
+
+        .empty-history-subtext {
+            font-size: 0.9rem;
+            color: #9ca3af;
+        }
     </style>
 </head>
 <body>
     <div class="container">
-        <h1>Maru-Text-to-Speech</h1>
+        <div class="header">
+            <h1>Maru-Text-to-Speech</h1>
+            <button id="historyBtn" class="history-btn">
+                📚 履歴
+            </button>
+        </div>
         
         <textarea id="textInput" placeholder="読み上げたいテキストを入力してください..."></textarea>
 
@@ -647,6 +920,22 @@
                 </div>
             </div>
         </div>
+
+        <!-- 履歴モーダル -->
+        <div id="historyModal" class="history-modal">
+            <div class="history-modal-content">
+                <div class="history-modal-header">
+                    <h2 class="history-modal-title">📚 読み上げ履歴</h2>
+                    <button id="closeHistoryModal" class="close-btn">&times;</button>
+                </div>
+                <div class="history-modal-body">
+                    <div id="historyList"></div>
+                    <button id="clearAllHistoryBtn" class="clear-all-btn" style="display: none;">
+                        🗑️ すべて削除
+                    </button>
+                </div>
+            </div>
+        </div>
     </div>
 
     <script>
@@ -672,6 +961,164 @@
 
         // デバッグ表示用の要素を追加
         let selectedVoiceInfo = null;
+
+        // 履歴管理機能
+        function saveToHistory(text, language, rate, pitch) {
+            try {
+                const history = JSON.parse(localStorage.getItem('ttsHistory') || '[]');
+                const entry = {
+                    text: text,
+                    language: language,
+                    rate: rate,
+                    pitch: pitch,
+                    timestamp: new Date().toISOString()
+                };
+
+                // 重複チェック（同じテキストが既に存在する場合は削除してから追加）
+                const filteredHistory = history.filter(item => item.text !== text);
+                filteredHistory.unshift(entry);
+
+                // 最大50件まで保存
+                if (filteredHistory.length > 50) {
+                    filteredHistory.splice(50);
+                }
+
+                localStorage.setItem('ttsHistory', JSON.stringify(filteredHistory));
+                console.log('履歴に保存しました:', entry);
+            } catch (error) {
+                console.error('履歴保存エラー:', error);
+            }
+        }
+
+        function getHistory() {
+            try {
+                return JSON.parse(localStorage.getItem('ttsHistory') || '[]');
+            } catch (error) {
+                console.error('履歴取得エラー:', error);
+                return [];
+            }
+        }
+
+        function clearHistory() {
+            try {
+                localStorage.removeItem('ttsHistory');
+                console.log('履歴をクリアしました');
+            } catch (error) {
+                console.error('履歴クリアエラー:', error);
+            }
+        }
+
+        function deleteHistoryItem(index) {
+            try {
+                const history = getHistory();
+                history.splice(index, 1);
+                localStorage.setItem('ttsHistory', JSON.stringify(history));
+                console.log('履歴項目を削除しました');
+                displayHistory(); // リストを更新
+            } catch (error) {
+                console.error('履歴削除エラー:', error);
+            }
+        }
+
+        function displayHistory() {
+            const historyList = document.getElementById('historyList');
+            const clearAllBtn = document.getElementById('clearAllHistoryBtn');
+            const history = getHistory();
+
+            if (history.length === 0) {
+                historyList.innerHTML = `
+                    <div class="history-empty">
+                        <p>📝 まだ履歴がありません</p>
+                        <p class="history-empty-sub">テキストを読み上げると履歴が表示されます</p>
+                    </div>
+                `;
+                if (clearAllBtn) clearAllBtn.style.display = 'none';
+                return;
+            }
+
+            // 履歴がある場合はクリアボタンを表示
+            if (clearAllBtn) clearAllBtn.style.display = 'block';
+
+            historyList.innerHTML = history.map((item, index) => {
+                const date = new Date(item.timestamp);
+                const dateStr = date.toLocaleDateString('ja-JP', {
+                    month: 'short',
+                    day: 'numeric',
+                    hour: '2-digit',
+                    minute: '2-digit'
+                });
+
+                const languageFlag = item.language === 'ja' ? '🇯🇵' : '🇺🇸';
+                const truncatedText = item.text.length > 80 ? item.text.substring(0, 80) + '...' : item.text;
+
+                return `
+                    <div class="history-item">
+                        <div class="history-item-header">
+                            <span class="history-item-lang">${languageFlag} ${item.language.toUpperCase()}</span>
+                            <span class="history-item-date">${dateStr}</span>
+                        </div>
+                        <div class="history-item-text">${truncatedText}</div>
+                        <div class="history-item-params">
+                            ⚡ 速度: ${item.rate} | 🎵 ピッチ: ${item.pitch}
+                        </div>
+                        <div class="history-item-actions">
+                            <button class="history-practice-btn" onclick="practiceHistoryItem(${index})">
+                                🎯 練習する
+                            </button>
+                            <button class="history-delete-btn" onclick="deleteHistoryItem(${index})">
+                                🗑️ 削除
+                            </button>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+        }
+
+        function practiceHistoryItem(index) {
+            try {
+                const history = getHistory();
+                if (index >= 0 && index < history.length) {
+                    const item = history[index];
+
+                    // テキストエリアに復元
+                    textInput.value = item.text;
+
+                    // パラメータを復元
+                    rateRange.value = item.rate;
+                    rateValue.textContent = item.rate;
+                    pitchRange.value = item.pitch;
+                    pitchValue.textContent = item.pitch;
+
+                    // 言語検出をトリガー
+                    const event = new Event('input', { bubbles: true });
+                    textInput.dispatchEvent(event);
+
+                    // モーダルを閉じる
+                    closeHistoryModal();
+
+                    // テキストエリアにフォーカス
+                    setTimeout(() => {
+                        textInput.focus();
+                        textInput.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    }, 300);
+
+                    console.log('履歴項目を復元しました:', item);
+                }
+            } catch (error) {
+                console.error('履歴復元エラー:', error);
+            }
+        }
+
+        function openHistoryModal() {
+            displayHistory();
+            document.getElementById('historyModal').style.display = 'flex';
+            document.body.style.overflow = 'hidden'; // スクロール防止
+        }
+
+        function closeHistoryModal() {
+            document.getElementById('historyModal').style.display = 'none';
+            document.body.style.overflow = ''; // スクロール復元
+        }
 
         // リアルタイム変更用ユーティリティ関数
         function handleRealtimeParamChange() {
@@ -1472,6 +1919,9 @@
             currentSentenceIndex = 0;
             originalText = text;
 
+            // 履歴に保存
+            saveToHistory(text, 'ja', rateRange.value, pitchRange.value);
+
             speakJapaneseFromIndex(0);
         }
 
@@ -1570,6 +2020,9 @@
                 status.textContent = 'エラーが発生しました';
                 resetButtons();
             };
+
+            // 履歴に保存
+            saveToHistory(text, detectedLang, rateRange.value, pitchRange.value);
 
             // 読み上げ開始
             synth.speak(utterance);
@@ -1729,6 +2182,45 @@
                     debugInfo.style.display = 'block';
                 }
             }
+
+            // 履歴関連のイベントリスナー
+            const historyBtn = document.getElementById('historyBtn');
+            const closeHistoryBtn = document.getElementById('closeHistoryModal');
+            const historyModal = document.getElementById('historyModal');
+            const clearAllBtn = document.getElementById('clearAllHistoryBtn');
+
+            if (historyBtn) {
+                historyBtn.addEventListener('click', openHistoryModal);
+            }
+
+            if (closeHistoryBtn) {
+                closeHistoryBtn.addEventListener('click', closeHistoryModal);
+            }
+
+            if (clearAllBtn) {
+                clearAllBtn.addEventListener('click', () => {
+                    if (confirm('すべての履歴を削除しますか？この操作は取り消せません。')) {
+                        clearHistory();
+                        displayHistory();
+                    }
+                });
+            }
+
+            // モーダル外クリックで閉じる
+            if (historyModal) {
+                historyModal.addEventListener('click', (e) => {
+                    if (e.target === historyModal) {
+                        closeHistoryModal();
+                    }
+                });
+            }
+
+            // ESCキーでモーダルを閉じる
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape' && historyModal.style.display === 'flex') {
+                    closeHistoryModal();
+                }
+            });
         });
 
         // Service Worker登録
