@@ -986,12 +986,6 @@
 
         </div>
 
-        <div style="display: flex; justify-content: center; margin-bottom: 16px;">
-            <button id="historyBtn" class="history-btn">
-                History
-            </button>
-        </div>
-
         <div class="buttons">
             <div class="control-buttons">
                 <button id="skipBackBtn" class="skip-btn" title="15秒戻る">
@@ -1023,10 +1017,16 @@
                 </button>
             </div>
         </div>
+
+        <div style="display: flex; justify-content: center; margin-bottom: 16px;">
+            <button id="historyBtn" class="history-btn">
+                History
+            </button>
+        </div>
         
         <div id="status" class="status">準備完了</div>
 
-        <!-- デバッグ表示（音声情報） -->
+        <!-- デバッグ表示（音声情報）- 非表示 -->
         <div id="voiceDebugInfo" class="voice-debug-info" style="display: none;">
             <small style="color: #666; font-size: 12px;">
                 音声: <span id="selectedVoiceName">未選択</span><br>
@@ -1812,7 +1812,7 @@
                 else deviceInfo = 'PC';
 
                 voiceName.textContent = `${voice.name} (${deviceInfo})`;
-                debugInfo.style.display = 'block';
+                // debugInfo.style.display = 'block'; // 非表示
 
                 // 速度とピッチの情報も更新
                 updateSpeedDebugInfo();
@@ -1838,7 +1838,7 @@
 
                 // デバッグ情報を表示
                 if (debugInfo) {
-                    debugInfo.style.display = 'block';
+                    // debugInfo.style.display = 'block'; // 非表示
                 }
             }
         }
@@ -2275,7 +2275,7 @@
             if (isMobile) {
                 const debugInfo = document.getElementById('voiceDebugInfo');
                 if (debugInfo) {
-                    debugInfo.style.display = 'block';
+                    // debugInfo.style.display = 'block'; // 非表示
                 }
             }
 
