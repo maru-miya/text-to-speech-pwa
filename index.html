@@ -14,101 +14,127 @@
 
         body {
             font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-            background: #f8f9fa;
+            background: #ffffff;
             min-height: 100vh;
             padding: 20px;
             display: flex;
             align-items: center;
             justify-content: center;
+            color: #1f2937;
         }
 
         .container {
-            background: white;
-            border-radius: 16px;
-            padding: 40px;
-            max-width: 600px;
+            background: #ffffff;
+            border-radius: 6px;
+            padding: 32px;
+            max-width: 640px;
             width: 100%;
-            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
-            border: 1px solid #e0e0e0;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.08);
+            border: 1px solid #e5e7eb;
         }
 
         h1 {
-            color: #333333;
-            margin-bottom: 30px;
+            color: #1f2937;
+            margin-bottom: 32px;
             text-align: center;
             font-weight: 600;
+            font-size: 28px;
         }
 
         textarea {
             width: 100%;
             min-height: 150px;
-            padding: 15px;
-            border: 2px solid #e0e0e0;
-            border-radius: 10px;
+            padding: 16px;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
             font-size: 16px;
+            line-height: 1.6;
             resize: vertical;
-            margin-bottom: 20px;
+            margin-bottom: 24px;
+            background: #ffffff;
+            color: #1f2937;
+            font-family: inherit;
         }
 
         textarea:focus {
             outline: none;
-            border-color: #4a90e2;
+            border-color: #2563eb;
+        }
+
+        textarea::placeholder {
+            color: #9ca3af;
         }
 
         .controls {
             display: flex;
-            gap: 15px;
-            margin-bottom: 20px;
-            flex-wrap: wrap;
+            flex-direction: column;
+            gap: 24px;
+            margin-bottom: 24px;
         }
 
-        select, input[type="range"] {
-            flex: 1;
-            min-width: 150px;
-            padding: 10px;
-            border: 2px solid #e0e0e0;
-            border-radius: 8px;
-            background: white;
+        select {
+            width: 100%;
+            padding: 12px 16px;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            background: #ffffff;
+            color: #1f2937;
+            font-size: 16px;
         }
 
         select:focus {
             outline: none;
-            border-color: #4a90e2;
+            border-color: #2563eb;
         }
 
         .buttons {
             display: flex;
-            gap: 10px;
+            gap: 16px;
             justify-content: center;
+            align-items: center;
+            margin: 32px 0;
         }
 
         button {
-            padding: 12px 24px;
             border: none;
-            border-radius: 8px;
-            font-size: 16px;
             cursor: pointer;
-            transition: all 0.3s;
+            transition: all 0.2s ease-out;
+            font-weight: 500;
         }
 
         .btn-speak {
-            background: #4a90e2;
+            background: #2563eb;
             color: white;
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 6px rgba(37, 99, 235, 0.15);
+            font-size: 18px;
         }
 
         .btn-speak:hover {
-            background: #357abd;
-            transform: translateY(-1px);
-            box-shadow: 0 2px 8px rgba(74, 144, 226, 0.3);
+            background: #3b82f6;
+        }
+
+        .btn-speak:active {
+            background: #1d4ed8;
         }
 
         .btn-stop {
-            background: #e53e3e;
-            color: white;
+            background: #ffffff;
+            color: #6b7280;
+            border: 1px solid #e5e7eb;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 14px;
         }
 
         .btn-stop:hover {
-            background: #c53030;
+            background: #f9fafb;
+            border-color: #d1d5db;
         }
 
         button:disabled {
@@ -118,21 +144,25 @@
 
         .status {
             text-align: center;
-            margin-top: 20px;
-            color: #666;
+            margin-top: 24px;
+            color: #6b7280;
+            font-size: 14px;
+            font-weight: 500;
         }
 
         .language-info {
-            background: #f8f9fa;
-            border-radius: 8px;
-            padding: 15px;
-            margin-bottom: 20px;
-            border-left: 4px solid #4a90e2;
+            background: #f9fafb;
+            border-radius: 6px;
+            padding: 16px;
+            margin-bottom: 24px;
+            border: 1px solid #e5e7eb;
+            border-left: 3px solid #2563eb;
         }
 
         .language-info span {
-            font-weight: bold;
-            color: #333;
+            font-weight: 500;
+            color: #1f2937;
+            font-size: 14px;
         }
 
         .voice-quality {
@@ -145,12 +175,17 @@
         }
 
         .btn-pause {
-            background: #ed8936;
-            color: white;
+            background: #ffffff;
+            color: #6b7280;
+            border: 1px solid #e5e7eb;
+            padding: 8px 16px;
+            border-radius: 6px;
+            font-size: 14px;
         }
 
         .btn-pause:hover {
-            background: #dd7724;
+            background: #f9fafb;
+            border-color: #d1d5db;
         }
 
         .flag-icon {
@@ -165,29 +200,31 @@
         }
 
         .preset-btn {
-            padding: 6px 12px;
-            border: 1px solid #e0e0e0;
-            border-radius: 20px;
-            background: white;
-            color: #333333;
-            font-size: 14px;
+            padding: 0 12px;
+            height: 32px;
+            border: 1px solid #e5e7eb;
+            border-radius: 16px;
+            background: #ffffff;
+            color: #6b7280;
+            font-size: 13px;
+            font-weight: 500;
             cursor: pointer;
-            transition: all 0.2s;
+            transition: all 0.2s ease-out;
             min-width: 44px;
-            text-align: center;
+            display: flex;
+            align-items: center;
+            justify-content: center;
         }
 
         .preset-btn:hover {
-            background: #f8f9fa;
-            border-color: #4a90e2;
-            transform: translateY(-1px);
-            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+            background: #f9fafb;
+            border-color: #d1d5db;
         }
 
         .preset-btn.active {
-            background: #4a90e2;
+            background: #2563eb;
             color: white;
-            border-color: #4a90e2;
+            border-color: #2563eb;
         }
 
         .control-group {
@@ -196,9 +233,85 @@
 
         .control-label {
             font-weight: 500;
-            color: #333333;
+            color: #6b7280;
             margin-bottom: 8px;
             display: block;
+            font-size: 13px;
+        }
+
+        input[type="range"] {
+            width: 100%;
+            height: 4px;
+            background: #e5e7eb;
+            border-radius: 2px;
+            outline: none;
+            -webkit-appearance: none;
+            margin: 8px 0;
+        }
+
+        input[type="range"]::-webkit-slider-thumb {
+            appearance: none;
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #ffffff;
+            border: 2px solid #2563eb;
+            cursor: pointer;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        input[type="range"]::-moz-range-thumb {
+            width: 20px;
+            height: 20px;
+            border-radius: 50%;
+            background: #ffffff;
+            border: 2px solid #2563eb;
+            cursor: pointer;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+        }
+
+        .slider-value {
+            background: #2563eb;
+            color: white;
+            padding: 4px 8px;
+            border-radius: 12px;
+            font-size: 12px;
+            font-weight: 500;
+            display: inline-block;
+            min-width: 36px;
+            text-align: center;
+        }
+
+        .skip-btn {
+            width: 40px;
+            height: 40px;
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            background: #ffffff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.2s ease-out;
+        }
+
+        .skip-btn:hover {
+            background: #f9fafb;
+            border-color: #d1d5db;
+        }
+
+        .skip-btn svg {
+            width: 16px;
+            height: 16px;
+            stroke: #6b7280;
+            stroke-width: 2px;
+            fill: none;
+        }
+
+        .skip-controls {
+            display: flex;
+            align-items: center;
+            gap: 8px;
         }
     </style>
 </head>
@@ -245,9 +358,29 @@
         </div>
         
         <div class="buttons">
-            <button id="speakBtn" class="btn-speak">読み上げる</button>
-            <button id="pauseBtn" class="btn-pause">一時停止</button>
-            <button id="stopBtn" class="btn-stop">停止</button>
+            <div class="skip-controls">
+                <button id="skipBackBtn" class="skip-btn" title="15秒戻る">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M11 7l-5 5 5 5M18 7l-5 5 5 5"/>
+                        <text x="12" y="16" text-anchor="middle" font-size="6" fill="#6b7280">15</text>
+                    </svg>
+                </button>
+                <button id="speakBtn" class="btn-speak">
+                    <svg viewBox="0 0 24 24" fill="currentColor">
+                        <path d="M8 5v14l11-7z"/>
+                    </svg>
+                </button>
+                <button id="skipForwardBtn" class="skip-btn" title="15秒進む">
+                    <svg viewBox="0 0 24 24">
+                        <path d="M13 17l5-5-5-5M6 17l5-5-5-5"/>
+                        <text x="12" y="16" text-anchor="middle" font-size="6" fill="#6b7280">15</text>
+                    </svg>
+                </button>
+            </div>
+            <div style="display: flex; gap: 8px; margin-top: 16px;">
+                <button id="pauseBtn" class="btn-pause">一時停止</button>
+                <button id="stopBtn" class="btn-stop">停止</button>
+            </div>
         </div>
         
         <div id="status" class="status">準備完了</div>
@@ -259,6 +392,8 @@
         let voices = [];
         let currentUtterance = null;
         let isPaused = false;
+        let currentText = '';
+        let currentPosition = 0;
 
         // DOM要素の取得
         const textInput = document.getElementById('textInput');
@@ -270,6 +405,8 @@
         const speakBtn = document.getElementById('speakBtn');
         const pauseBtn = document.getElementById('pauseBtn');
         const stopBtn = document.getElementById('stopBtn');
+        const skipBackBtn = document.getElementById('skipBackBtn');
+        const skipForwardBtn = document.getElementById('skipForwardBtn');
         const status = document.getElementById('status');
         const languageInfo = document.getElementById('languageInfo');
         const detectedLanguage = document.getElementById('detectedLanguage');
@@ -499,6 +636,7 @@
             synth.cancel();
             isPaused = false;
             pauseBtn.textContent = '一時停止';
+            currentPosition = 0;
 
             // 言語検出
             const detectedLang = detectLanguage(text);
@@ -509,6 +647,7 @@
                 processedText = preprocessEnglishText(text);
             }
 
+            currentText = processedText;
             const utterance = new SpeechSynthesisUtterance(processedText);
             currentUtterance = utterance;
 
@@ -538,24 +677,18 @@
                 status.textContent = '読み上げ中...';
                 speakBtn.disabled = true;
                 pauseBtn.disabled = false;
+                skipBackBtn.disabled = false;
+                skipForwardBtn.disabled = false;
             };
 
             utterance.onend = () => {
                 status.textContent = '読み上げ完了';
-                speakBtn.disabled = false;
-                pauseBtn.disabled = true;
-                currentUtterance = null;
-                isPaused = false;
-                pauseBtn.textContent = '一時停止';
+                resetButtons();
             };
 
             utterance.onerror = () => {
                 status.textContent = 'エラーが発生しました';
-                speakBtn.disabled = false;
-                pauseBtn.disabled = true;
-                currentUtterance = null;
-                isPaused = false;
-                pauseBtn.textContent = '一時停止';
+                resetButtons();
             };
 
             // 読み上げ開始
@@ -581,15 +714,107 @@
         stopBtn.addEventListener('click', () => {
             synth.cancel();
             status.textContent = '停止しました';
-            speakBtn.disabled = false;
-            pauseBtn.disabled = true;
-            currentUtterance = null;
-            isPaused = false;
-            pauseBtn.textContent = '一時停止';
+            resetButtons();
         });
         
         // 初期状態の設定
         pauseBtn.disabled = true;
+        skipBackBtn.disabled = true;
+        skipForwardBtn.disabled = true;
+
+        // スキップ機能
+        function skipText(seconds, direction) {
+            if (!currentText) return;
+
+            const words = currentText.split(/\s+/);
+            const wordsPerSecond = 2.5; // 平均的な読み上げ速度
+            const skipWords = Math.floor(seconds * wordsPerSecond);
+
+            if (direction === 'forward') {
+                currentPosition = Math.min(currentPosition + skipWords, words.length);
+            } else {
+                currentPosition = Math.max(currentPosition - skipWords, 0);
+            }
+
+            if (synth.speaking) {
+                synth.cancel();
+                const remainingText = words.slice(currentPosition).join(' ');
+                if (remainingText) {
+                    speakFromPosition(remainingText);
+                } else {
+                    status.textContent = '読み上げ完了';
+                    resetButtons();
+                }
+            }
+        }
+
+        function speakFromPosition(text) {
+            if (!text.trim()) return;
+
+            const utterance = new SpeechSynthesisUtterance(text);
+            currentUtterance = utterance;
+
+            // 音声設定を適用
+            const selectedIndex = voiceSelect.value;
+            if (selectedIndex !== '' && voices[selectedIndex]) {
+                utterance.voice = voices[selectedIndex];
+            } else {
+                const detectedLang = detectLanguage(text);
+                const optimalVoice = getOptimalVoice(detectedLang);
+                if (optimalVoice) {
+                    utterance.voice = optimalVoice;
+                }
+            }
+
+            const detectedLang = detectLanguage(text);
+            if (detectedLang === 'en') {
+                utterance.rate = parseFloat(rateRange.value) * 0.9;
+                utterance.pitch = parseFloat(pitchRange.value);
+            } else {
+                utterance.rate = parseFloat(rateRange.value);
+                utterance.pitch = parseFloat(pitchRange.value);
+            }
+
+            utterance.onstart = () => {
+                status.textContent = '読み上げ中...';
+                speakBtn.disabled = true;
+                pauseBtn.disabled = false;
+                skipBackBtn.disabled = false;
+                skipForwardBtn.disabled = false;
+            };
+
+            utterance.onend = () => {
+                status.textContent = '読み上げ完了';
+                resetButtons();
+            };
+
+            utterance.onerror = () => {
+                status.textContent = 'エラーが発生しました';
+                resetButtons();
+            };
+
+            synth.speak(utterance);
+        }
+
+        function resetButtons() {
+            speakBtn.disabled = false;
+            pauseBtn.disabled = true;
+            skipBackBtn.disabled = true;
+            skipForwardBtn.disabled = true;
+            currentUtterance = null;
+            isPaused = false;
+            pauseBtn.textContent = '一時停止';
+            currentPosition = 0;
+        }
+
+        // スキップボタンのイベントリスナー
+        skipBackBtn.addEventListener('click', () => {
+            skipText(15, 'backward');
+        });
+
+        skipForwardBtn.addEventListener('click', () => {
+            skipText(15, 'forward');
+        });
 
         // ブラウザ対応チェック
         if (!('speechSynthesis' in window)) {
