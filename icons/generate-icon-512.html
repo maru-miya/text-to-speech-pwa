@@ -2,60 +2,198 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Icon Generator 512x512</title>
+    <title>Apple-style Icon Generator 512x512</title>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background: #f5f5f7;
+            font-family: -apple-system, BlinkMacSystemFont, sans-serif;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 20px;
+        }
+        canvas {
+            border-radius: 114px;
+            box-shadow: 0 20px 60px rgba(0,0,0,0.15);
+            max-width: 300px;
+            max-height: 300px;
+        }
+        #download {
+            padding: 12px 24px;
+            background: #007AFF;
+            color: white;
+            text-decoration: none;
+            border-radius: 8px;
+            font-weight: 600;
+        }
+        #download:hover { background: #0051D5; }
+    </style>
 </head>
 <body>
-    <canvas id="canvas" width="512" height="512" style="border: 1px solid #ccc;"></canvas>
-    <br>
-    <a id="download" download="icon-512.png">Download icon-512.png</a>
+    <div class="container">
+        <h1>maru-text-to-speech App Icon</h1>
+        <p>512x512 - High resolution Apple-style design with history feature indication</p>
+
+        <canvas id="canvas" width="512" height="512"></canvas>
+        <a id="download" download="icon-512.png">Download icon-512.png</a>
+    </div>
 
     <script>
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
         const size = 512;
 
-        // Background gradient
-        const gradient = ctx.createLinearGradient(0, 0, size, size);
-        gradient.addColorStop(0, '#4facfe');
-        gradient.addColorStop(0.5, '#00f2fe');
-        gradient.addColorStop(1, '#667eea');
+        // iOS rounded rectangle background
+        const cornerRadius = size * 0.22; // iOS standard 22.37%
 
-        ctx.fillStyle = gradient;
-        ctx.fillRect(0, 0, size, size);
+        // Background gradient - sophisticated blue with depth
+        const bgGradient = ctx.createLinearGradient(0, 0, size, size);
+        bgGradient.addColorStop(0, '#4A90E2');
+        bgGradient.addColorStop(0.3, '#357ABD');
+        bgGradient.addColorStop(0.7, '#2E6BA8');
+        bgGradient.addColorStop(1, '#1F4788');
 
-        // Icon design
-        const centerX = size / 2;
-        const centerY = size / 2;
-        const scale = size / 200;
-
-        // Microphone
-        ctx.fillStyle = 'white';
-        ctx.strokeStyle = 'white';
-        ctx.lineWidth = 3 * scale;
-
-        // Mic body
+        // Draw rounded rectangle background
+        ctx.fillStyle = bgGradient;
         ctx.beginPath();
-        ctx.roundRect(centerX - 15 * scale, centerY - 30 * scale, 30 * scale, 40 * scale, 15 * scale);
+        ctx.roundRect(0, 0, size, size, cornerRadius);
         ctx.fill();
 
-        // Mic stand
+        // Add highlight gradient for depth
+        const highlightGradient = ctx.createLinearGradient(0, 0, size, size * 0.5);
+        highlightGradient.addColorStop(0, 'rgba(255,255,255,0.3)');
+        highlightGradient.addColorStop(1, 'rgba(255,255,255,0)');
+
+        ctx.fillStyle = highlightGradient;
         ctx.beginPath();
-        ctx.moveTo(centerX, centerY + 10 * scale);
-        ctx.lineTo(centerX, centerY + 30 * scale);
+        ctx.roundRect(0, 0, size, size * 0.5, cornerRadius);
+        ctx.fill();
+
+        // Constants for positioning
+        const centerX = size / 2;
+        const centerY = size / 2;
+        const scale = size / 144;
+
+        // Main microphone design
+        const micGradient = ctx.createLinearGradient(0, centerY - 30*scale, 0, centerY + 30*scale);
+        micGradient.addColorStop(0, '#FFFFFF');
+        micGradient.addColorStop(1, '#F0F4F8');
+
+        // Microphone body with shadow
+        ctx.shadowColor = 'rgba(0,0,0,0.25)';
+        ctx.shadowBlur = 12 * scale;
+        ctx.shadowOffsetY = 6 * scale;
+
+        ctx.fillStyle = micGradient;
+        ctx.beginPath();
+        ctx.roundRect(centerX - 14*scale, centerY - 21*scale, 28*scale, 42*scale, 14*scale);
+        ctx.fill();
+
+        // Microphone stand
+        ctx.shadowBlur = 6 * scale;
+        ctx.fillRect(centerX - 2*scale, centerY + 21*scale, 4*scale, 20*scale);
+
+        // Microphone base
+        ctx.beginPath();
+        ctx.roundRect(centerX - 10*scale, centerY + 41*scale, 20*scale, 6*scale, 3*scale);
+        ctx.fill();
+
+        // Reset shadow
+        ctx.shadowColor = 'transparent';
+        ctx.shadowBlur = 0;
+        ctx.shadowOffsetY = 0;
+
+        // History indicator circle (top right) - larger for 512px
+        const historyX = size - 128*scale;
+        const historyY = 128*scale;
+        const historyRadius = 42*scale;
+
+        const historyGradient = ctx.createLinearGradient(
+            historyX - historyRadius, historyY - historyRadius,
+            historyX + historyRadius, historyY + historyRadius
+        );
+        historyGradient.addColorStop(0, '#FF8A50');
+        historyGradient.addColorStop(1, '#FF6B35');
+
+        ctx.shadowColor = 'rgba(0,0,0,0.3)';
+        ctx.shadowBlur = 12 * scale;
+        ctx.shadowOffsetY = 6 * scale;
+
+        ctx.fillStyle = historyGradient;
+        ctx.beginPath();
+        ctx.arc(historyX, historyY, historyRadius, 0, 2 * Math.PI);
+        ctx.fill();
+
+        // Clock icon inside history circle
+        ctx.shadowColor = 'transparent';
+        ctx.shadowBlur = 0;
+        ctx.shadowOffsetY = 0;
+
+        // Clock face
+        ctx.fillStyle = 'rgba(255,255,255,0.95)';
+        ctx.beginPath();
+        ctx.arc(historyX, historyY, 28*scale, 0, 2 * Math.PI);
+        ctx.fill();
+
+        // Clock hands
+        ctx.strokeStyle = '#1F4788';
+        ctx.lineCap = 'round';
+
+        // Hour hand
+        ctx.lineWidth = 6 * scale;
+        ctx.beginPath();
+        ctx.moveTo(historyX, historyY);
+        ctx.lineTo(historyX, historyY - 14*scale);
         ctx.stroke();
 
-        // Mic base
+        // Minute hand
+        ctx.lineWidth = 4 * scale;
         ctx.beginPath();
-        ctx.moveTo(centerX - 15 * scale, centerY + 30 * scale);
-        ctx.lineTo(centerX + 15 * scale, centerY + 30 * scale);
+        ctx.moveTo(historyX, historyY);
+        ctx.lineTo(historyX + 10*scale, historyY);
         ctx.stroke();
 
-        // TTS Text
-        ctx.fillStyle = '#4facfe';
-        ctx.font = `bold ${Math.max(16, size * 0.08)}px Arial`;
-        ctx.textAlign = 'center';
-        ctx.textBaseline = 'middle';
-        ctx.fillText('TTS', centerX, centerY + 60 * scale);
+        // Center dot
+        ctx.fillStyle = '#1F4788';
+        ctx.beginPath();
+        ctx.arc(historyX, historyY, 4*scale, 0, 2 * Math.PI);
+        ctx.fill();
+
+        // Sound waves emanating from microphone
+        ctx.strokeStyle = 'rgba(255,255,255,0.8)';
+        ctx.lineWidth = 8 * scale;
+        ctx.lineCap = 'round';
+
+        // Wave 1
+        ctx.globalAlpha = 0.8;
+        ctx.beginPath();
+        ctx.arc(centerX + 14*scale, centerY, 55*scale, -Math.PI/3, Math.PI/3, false);
+        ctx.stroke();
+
+        // Wave 2
+        ctx.globalAlpha = 0.6;
+        ctx.beginPath();
+        ctx.arc(centerX + 14*scale, centerY, 88*scale, -Math.PI/4, Math.PI/4, false);
+        ctx.stroke();
+
+        // Wave 3
+        ctx.globalAlpha = 0.4;
+        ctx.beginPath();
+        ctx.arc(centerX + 14*scale, centerY, 122*scale, -Math.PI/6, Math.PI/6, false);
+        ctx.stroke();
+
+        ctx.globalAlpha = 1;
+
+        // Subtle inner border for polish
+        ctx.strokeStyle = 'rgba(255,255,255,0.1)';
+        ctx.lineWidth = 2;
+        ctx.beginPath();
+        ctx.roundRect(2, 2, size-4, size-4, cornerRadius-2);
+        ctx.stroke();
 
         // Setup download
         canvas.toBlob(function(blob) {

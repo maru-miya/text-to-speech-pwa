@@ -2,7 +2,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Apple-style Icon Generator 144x144</title>
+    <title>Apple Touch Icon Generator 180x180</title>
     <style>
         body {
             margin: 0;
@@ -17,7 +17,7 @@
             gap: 20px;
         }
         canvas {
-            border-radius: 32px;
+            border-radius: 40px;
             box-shadow: 0 8px 32px rgba(0,0,0,0.15);
         }
         #download {
@@ -33,20 +33,20 @@
 </head>
 <body>
     <div class="container">
-        <h1>maru-text-to-speech App Icon</h1>
-        <p>Apple-style design with history feature indication</p>
+        <h1>maru-text-to-speech Apple Touch Icon</h1>
+        <p>180x180 - Apple Touch Icon with history feature indication</p>
 
-        <canvas id="canvas" width="144" height="144"></canvas>
-        <a id="download" download="icon-144.png">Download icon-144.png</a>
+        <canvas id="canvas" width="180" height="180"></canvas>
+        <a id="download" download="apple-touch-icon-180.png">Download apple-touch-icon-180.png</a>
     </div>
 
     <script>
         const canvas = document.getElementById('canvas');
         const ctx = canvas.getContext('2d');
-        const size = 144;
+        const size = 180;
 
-        // iOS rounded rectangle background
-        const cornerRadius = size * 0.22; // iOS standard 22.37%
+        // iOS rounded rectangle background (must NOT have rounded corners for Apple Touch Icon)
+        // Apple automatically applies rounded corners
 
         // Background gradient - sophisticated blue with depth
         const bgGradient = ctx.createLinearGradient(0, 0, size, size);
@@ -55,11 +55,9 @@
         bgGradient.addColorStop(0.7, '#2E6BA8');
         bgGradient.addColorStop(1, '#1F4788');
 
-        // Draw rounded rectangle background
+        // Draw square background (Apple adds rounded corners automatically)
         ctx.fillStyle = bgGradient;
-        ctx.beginPath();
-        ctx.roundRect(0, 0, size, size, cornerRadius);
-        ctx.fill();
+        ctx.fillRect(0, 0, size, size);
 
         // Add highlight gradient for depth
         const highlightGradient = ctx.createLinearGradient(0, 0, size, size * 0.5);
@@ -67,9 +65,7 @@
         highlightGradient.addColorStop(1, 'rgba(255,255,255,0)');
 
         ctx.fillStyle = highlightGradient;
-        ctx.beginPath();
-        ctx.roundRect(0, 0, size, size * 0.5, cornerRadius);
-        ctx.fill();
+        ctx.fillRect(0, 0, size, size * 0.5);
 
         // Constants for positioning
         const centerX = size / 2;
@@ -106,9 +102,9 @@
         ctx.shadowOffsetY = 0;
 
         // History indicator circle (top right)
-        const historyX = size - 36*scale;
-        const historyY = 36*scale;
-        const historyRadius = 12*scale;
+        const historyX = size - 45*scale;
+        const historyY = 45*scale;
+        const historyRadius = 15*scale;
 
         const historyGradient = ctx.createLinearGradient(
             historyX - historyRadius, historyY - historyRadius,
@@ -134,7 +130,7 @@
         // Clock face
         ctx.fillStyle = 'rgba(255,255,255,0.95)';
         ctx.beginPath();
-        ctx.arc(historyX, historyY, 8*scale, 0, 2 * Math.PI);
+        ctx.arc(historyX, historyY, 10*scale, 0, 2 * Math.PI);
         ctx.fill();
 
         // Clock hands
@@ -142,56 +138,49 @@
         ctx.lineCap = 'round';
 
         // Hour hand
-        ctx.lineWidth = 1.5 * scale;
+        ctx.lineWidth = 1.8 * scale;
         ctx.beginPath();
         ctx.moveTo(historyX, historyY);
-        ctx.lineTo(historyX, historyY - 4*scale);
+        ctx.lineTo(historyX, historyY - 4.5*scale);
         ctx.stroke();
 
         // Minute hand
-        ctx.lineWidth = 1 * scale;
+        ctx.lineWidth = 1.2 * scale;
         ctx.beginPath();
         ctx.moveTo(historyX, historyY);
-        ctx.lineTo(historyX + 3*scale, historyY);
+        ctx.lineTo(historyX + 3.5*scale, historyY);
         ctx.stroke();
 
         // Center dot
         ctx.fillStyle = '#1F4788';
         ctx.beginPath();
-        ctx.arc(historyX, historyY, 1*scale, 0, 2 * Math.PI);
+        ctx.arc(historyX, historyY, 1.2*scale, 0, 2 * Math.PI);
         ctx.fill();
 
         // Sound waves emanating from microphone
         ctx.strokeStyle = 'rgba(255,255,255,0.8)';
-        ctx.lineWidth = 2 * scale;
+        ctx.lineWidth = 2.2 * scale;
         ctx.lineCap = 'round';
 
         // Wave 1
         ctx.globalAlpha = 0.8;
         ctx.beginPath();
-        ctx.arc(centerX + 14*scale, centerY, 15*scale, -Math.PI/3, Math.PI/3, false);
+        ctx.arc(centerX + 14*scale, centerY, 18*scale, -Math.PI/3, Math.PI/3, false);
         ctx.stroke();
 
         // Wave 2
         ctx.globalAlpha = 0.6;
         ctx.beginPath();
-        ctx.arc(centerX + 14*scale, centerY, 25*scale, -Math.PI/4, Math.PI/4, false);
+        ctx.arc(centerX + 14*scale, centerY, 30*scale, -Math.PI/4, Math.PI/4, false);
         ctx.stroke();
 
         // Wave 3
         ctx.globalAlpha = 0.4;
         ctx.beginPath();
-        ctx.arc(centerX + 14*scale, centerY, 35*scale, -Math.PI/6, Math.PI/6, false);
+        ctx.arc(centerX + 14*scale, centerY, 42*scale, -Math.PI/6, Math.PI/6, false);
         ctx.stroke();
 
         ctx.globalAlpha = 1;
-
-        // Subtle inner border for polish
-        ctx.strokeStyle = 'rgba(255,255,255,0.1)';
-        ctx.lineWidth = 1;
-        ctx.beginPath();
-        ctx.roundRect(1, 1, size-2, size-2, cornerRadius-1);
-        ctx.stroke();
 
         // Setup download
         canvas.toBlob(function(blob) {
