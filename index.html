@@ -749,6 +749,54 @@
             return processed;
         }
 
+        // 日本語テキストの前処理関数
+        function preprocessJapaneseText(text) {
+            let processed = text;
+
+            // 読みがな機能（例：東京[とうきょう]）
+            processed = processed.replace(/([^\[\]]+)\[([^\[\]]+)\]/g, '$2');
+
+            // 句読点の後に間を追加
+            processed = processed.replace(/。/g, '。　'); // 全角スペース
+            processed = processed.replace(/、/g, '、 '); // 半角スペース
+            processed = processed.replace(/！/g, '！　　'); // 長い間
+            processed = processed.replace(/？/g, '？　　'); // 長い間
+
+            // 会話文の検出と処理
+            processed = processed.replace(/「([^」]+)」/g, (match, content) => {
+                return `「 ${content} 」`; // 会話文の前後にスペース
+            });
+
+            // 強調記法の処理（**text**）
+            processed = processed.replace(/\*\*([^*]+)\*\*/g, (match, content) => {
+                return ` ${content} `; // 強調部分の前後にスペース
+            });
+
+            // 括弧内の処理
+            processed = processed.replace(/（([^）]+)）/g, (match, content) => {
+                return ` （${content}） `; // 括弧の前後にスペース
+            });
+
+            // 漢字の連続を避けるためのスペース挿入（実験的）
+            // 長い漢字列の間に微小な間を追加
+            processed = processed.replace(/([一-龯]{4,})/g, (match) => {
+                return match.replace(/([一-龯]{2})([一-龯]{2})/g, '$1 $2');
+            });
+
+            // 数字の読み方を改善
+            processed = processed.replace(/(\d+)年/g, '$1ねん');
+            processed = processed.replace(/(\d+)月/g, '$1がつ');
+            processed = processed.replace(/(\d+)日/g, '$1にち');
+            processed = processed.replace(/(\d+)時/g, '$1じ');
+            processed = processed.replace(/(\d+)分/g, '$1ふん');
+
+            // 余分なスペースを整理
+            processed = processed.replace(/\s+/g, ' ');
+            processed = processed.trim();
+
+            return processed;
+        }
+
         // 高品質音声の判定
         function getVoiceQuality(voice) {
             const highQualityProviders = ['Google', 'Microsoft', 'Apple', 'Amazon'];
@@ -878,17 +926,67 @@
             let targetVoices;
             if (detectedLang === 'ja') {
                 targetVoices = voices.filter(voice => voice.lang.includes('ja'));
+
+                // 日本語音声の優先順位
+                const priorityOrder = [
+                    'Google', // 最も自然
+                    'Microsoft Nanami',
+                    'Microsoft Haruka',
+                    'Apple Kyoko',
+                    'Apple Otoya'
+                ];
+
+                // 優先順位に基づいて音声を選択
+                for (const priority of priorityOrder) {
+                    const preferredVoice = targetVoices.find(voice =>
+                        voice.name.includes(priority) || voice.voiceURI.includes(priority)
+                    );
+                    if (preferredVoice) {
+                        return preferredVoice;
+                    }
+                }
             } else {
                 targetVoices = voices.filter(voice => voice.lang.includes('en'));
-            }
 
-            // 高品質音声を優先
-            const highQualityVoices = targetVoices.filter(voice => getVoiceQuality(voice));
-            if (highQualityVoices.length > 0) {
-                return highQualityVoices[0];
+                // 高品質音声を優先
+                const highQualityVoices = targetVoices.filter(voice => getVoiceQuality(voice));
+                if (highQualityVoices.length > 0) {
+                    return highQualityVoices[0];
+                }
             }
 
             return targetVoices.length > 0 ? targetVoices[0] : null;
+        }
+
+        // 日本語読み上げパラメータの最適化
+        function getOptimizedJapaneseParams(text, baseRate, basePitch) {
+            const textLength = text.length;
+            let optimizedRate = baseRate;
+            let optimizedPitch = basePitch;
+
+            // 文章の長さに応じてrateを調整
+            if (textLength < 30) {
+                optimizedRate = Math.min(baseRate * 1.05, 0.9); // 短文は少し速め
+            } else if (textLength > 100) {
+                optimizedRate = Math.max(baseRate * 0.95, 0.85); // 長文は少し遅め
+            } else {
+                optimizedRate = Math.max(baseRate * 0.95, 0.85); // 中文は遅め
+            }
+
+            // イントネーション改善
+            if (text.includes('？') || text.includes('ですか') || text.includes('ますか')) {
+                // 疑問文の場合、ピッチを少し上げる
+                optimizedPitch = Math.min(basePitch * 1.05, 1.1);
+            } else if (text.includes('！') || text.includes('です！') || text.includes('ます！')) {
+                // 感嘆文の場合、ピッチを高く、スピードを少し速く
+                optimizedPitch = Math.min(basePitch * 1.1, 1.15);
+                optimizedRate = Math.min(optimizedRate * 1.05, 0.95);
+            } else {
+                // 通常の文は自然な抑揚
+                optimizedPitch = Math.max(Math.min(basePitch, 1.05), 0.95);
+            }
+
+            return { rate: optimizedRate, pitch: optimizedPitch };
         }
 
         // 読み上げ/一時停止機能
@@ -929,9 +1027,19 @@
             let processedText = text;
             if (detectedLang === 'en') {
                 processedText = preprocessEnglishText(text);
+            } else if (detectedLang === 'ja') {
+                processedText = preprocessJapaneseText(text);
             }
 
             currentText = processedText;
+
+            // 日本語の場合は文章分割して自然な間を作る
+            if (detectedLang === 'ja') {
+                speakJapaneseWithPauses(processedText);
+                return;
+            }
+
+            // 英語その他の言語の従来処理
             const utterance = new SpeechSynthesisUtterance(processedText);
             currentUtterance = utterance;
 
@@ -955,6 +1063,86 @@
                 utterance.rate = parseFloat(rateRange.value);
                 utterance.pitch = parseFloat(pitchRange.value);
             }
+
+        // 日本語文章分割読み上げ機能
+        function speakJapaneseWithPauses(text) {
+            // 文章を句点と段落で分割
+            const sentences = text.split(/([。！？]|\n\n+)/).filter(s => s.trim());
+            let currentSentenceIndex = 0;
+
+            function speakNextSentence() {
+                if (currentSentenceIndex >= sentences.length) {
+                    status.textContent = '読み上げ完了';
+                    resetButtons();
+                    return;
+                }
+
+                const sentence = sentences[currentSentenceIndex].trim();
+                currentSentenceIndex++;
+
+                // 空の文や区切り文字のみの場合はスキップ
+                if (!sentence || /^[。！？\s]*$/.test(sentence)) {
+                    // 段落切り替えの場合は500ms待機
+                    if (sentence.includes('\n')) {
+                        setTimeout(speakNextSentence, 500);
+                    } else {
+                        speakNextSentence();
+                    }
+                    return;
+                }
+
+                const utterance = new SpeechSynthesisUtterance(sentence);
+                currentUtterance = utterance;
+
+                // 音声選択
+                const selectedIndex = voiceSelect.value;
+                if (selectedIndex !== '' && voices[selectedIndex]) {
+                    utterance.voice = voices[selectedIndex];
+                } else {
+                    const optimalVoice = getOptimalVoice('ja');
+                    if (optimalVoice) {
+                        utterance.voice = optimalVoice;
+                    }
+                }
+
+                // 日本語最適化パラメータを適用
+                const baseRate = parseFloat(rateRange.value);
+                const basePitch = parseFloat(pitchRange.value);
+                const optimized = getOptimizedJapaneseParams(sentence, baseRate, basePitch);
+
+                utterance.rate = optimized.rate;
+                utterance.pitch = optimized.pitch;
+                utterance.volume = 1.0;
+
+                // イベントハンドラ
+                utterance.onstart = () => {
+                    if (currentSentenceIndex === 1) {
+                        status.textContent = '読み上げ中...';
+                        updatePlayPauseButton(true);
+                        playPauseBtn.disabled = false;
+                        skipBackBtn.disabled = false;
+                        skipForwardBtn.disabled = false;
+                    }
+                };
+
+                utterance.onend = () => {
+                    // 文と文の間に300ms、段落の間に500msの自然な間を追加
+                    const nextSentence = sentences[currentSentenceIndex];
+                    const pauseDuration = (nextSentence && nextSentence.includes('\n')) ? 500 : 300;
+
+                    setTimeout(speakNextSentence, pauseDuration);
+                };
+
+                utterance.onerror = () => {
+                    status.textContent = 'エラーが発生しました';
+                    resetButtons();
+                };
+
+                synth.speak(utterance);
+            }
+
+            speakNextSentence();
+        }
 
             // イベントハンドラ
             utterance.onstart = () => {
