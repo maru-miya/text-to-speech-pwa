@@ -602,7 +602,10 @@
 
         <!-- デバッグ表示（音声情報） -->
         <div id="voiceDebugInfo" class="voice-debug-info" style="display: none;">
-            <small style="color: #666; font-size: 12px;">🎤 音声: <span id="selectedVoiceName">未選択</span></small>
+            <small style="color: #666; font-size: 12px;">
+                🎤 音声: <span id="selectedVoiceName">未選択</span><br>
+                ⚡ 速度: <span id="currentSpeedDebug">1.0</span> | 🎵 ピッチ: <span id="currentPitchDebug">1.0</span>
+            </small>
         </div>
 
         <div class="examples-section">
@@ -1036,21 +1039,53 @@
         loadVoices();
         
         // スライダーの更新
-        rateRange.addEventListener('input', () => {
+        // 速度変更の共通処理関数
+        function handleRateChange() {
             rateValue.textContent = rateRange.value;
             updateActivePresetBtn('rate', rateRange.value);
 
+            // デバッグ表示を更新
+            updateSpeedDebugInfo();
+
             // リアルタイム速度変更
             handleRealtimeParamChange();
-        });
+        }
 
-        pitchRange.addEventListener('input', () => {
+        // 速度スライダーのイベント（PC + モバイル対応）
+        rateRange.addEventListener('input', handleRateChange);
+
+        // スマホ専用イベント
+        if (isMobile) {
+            rateRange.addEventListener('change', handleRateChange);
+            rateRange.addEventListener('touchend', () => {
+                // touchend後に少し待ってから処理（値が確定するのを待つ）
+                setTimeout(handleRateChange, 50);
+            });
+        }
+
+        // ピッチ変更の共通処理関数
+        function handlePitchChange() {
             pitchValue.textContent = pitchRange.value;
             updateActivePresetBtn('pitch', pitchRange.value);
 
+            // デバッグ表示を更新
+            updateSpeedDebugInfo();
+
             // リアルタイムピッチ変更
             handleRealtimeParamChange();
-        });
+        }
+
+        // ピッチスライダーのイベント（PC + モバイル対応）
+        pitchRange.addEventListener('input', handlePitchChange);
+
+        // スマホ専用イベント
+        if (isMobile) {
+            pitchRange.addEventListener('change', handlePitchChange);
+            pitchRange.addEventListener('touchend', () => {
+                // touchend後に少し待ってから処理（値が確定するのを待つ）
+                setTimeout(handlePitchChange, 50);
+            });
+        }
 
         // プリセットボタンの機能
         function updateActivePresetBtn(type, value) {
@@ -1070,11 +1105,9 @@
             btn.addEventListener('click', () => {
                 const rate = btn.getAttribute('data-rate');
                 rateRange.value = rate;
-                rateValue.textContent = rate;
-                updateActivePresetBtn('rate', rate);
 
-                // リアルタイム速度変更
-                handleRealtimeParamChange();
+                // 共通処理を使用（デバッグ表示も更新される）
+                handleRateChange();
             });
         });
 
@@ -1083,11 +1116,9 @@
             btn.addEventListener('click', () => {
                 const pitch = btn.getAttribute('data-pitch');
                 pitchRange.value = pitch;
-                pitchValue.textContent = pitch;
-                updateActivePresetBtn('pitch', pitch);
 
-                // リアルタイムピッチ変更
-                handleRealtimeParamChange();
+                // 共通処理を使用（デバッグ表示も更新される）
+                handlePitchChange();
             });
         });
 
@@ -1221,6 +1252,37 @@
 
                 voiceName.textContent = `${voice.name} (${deviceInfo})`;
                 debugInfo.style.display = 'block';
+
+                // 速度とピッチの情報も更新
+                updateSpeedDebugInfo();
+            }
+        }
+
+        // 速度・ピッチのデバッグ情報を更新
+        function updateSpeedDebugInfo() {
+            const speedDebug = document.getElementById('currentSpeedDebug');
+            const pitchDebug = document.getElementById('currentPitchDebug');
+            const debugInfo = document.getElementById('voiceDebugInfo');
+
+            if (speedDebug && pitchDebug) {
+                const currentRate = rateRange.value;
+                const currentPitch = pitchRange.value;
+
+                // スマホの場合は実際に適用される値も表示
+                if (isMobile) {
+                    const detectedLang = detectLanguage(textInput.value.trim());
+                    const actualParams = getMobileOptimizedParams(detectedLang, currentRate, currentPitch);
+                    speedDebug.textContent = `${currentRate} → ${actualParams.rate.toFixed(2)}`;
+                    pitchDebug.textContent = `${currentPitch} → ${actualParams.pitch.toFixed(2)}`;
+                } else {
+                    speedDebug.textContent = currentRate;
+                    pitchDebug.textContent = currentPitch;
+                }
+
+                // デバッグ情報を表示
+                if (debugInfo) {
+                    debugInfo.style.display = 'block';
+                }
             }
         }
 
@@ -1246,8 +1308,8 @@
             // スマホ専用の設定
             if (detectedLang === 'en') {
                 return {
-                    rate: 0.9,  // スマホの英語は固定で少し遅め
-                    pitch: 1.0, // 自然なピッチ
+                    rate: parseFloat(baseRate) * 0.95, // スマホの英語はユーザー設定値の95%（少し自然に）
+                    pitch: parseFloat(basePitch),      // ユーザー設定のピッチを使用
                     volume: 1.0
                 };
             } else {
@@ -1653,6 +1715,20 @@
                     textInput.focus();
                 }, 300);
             });
+        });
+
+        // 初期化処理
+        document.addEventListener('DOMContentLoaded', () => {
+            // 初期のデバッグ表示を更新
+            updateSpeedDebugInfo();
+
+            // モバイルデバイスの場合、デバッグ情報を表示
+            if (isMobile) {
+                const debugInfo = document.getElementById('voiceDebugInfo');
+                if (debugInfo) {
+                    debugInfo.style.display = 'block';
+                }
+            }
         });
     </script>
 </body>
