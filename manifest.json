@@ -1,7 +1,7 @@
 {
-  "name": "Text-to-Speech PWA",
-  "short_name": "TTS PWA",
-  "description": "英語・日本語対応 高品質テキスト読み上げPWAアプリケーション",
+  "name": "maru-text-to-speech",
+  "short_name": "maru-TTS",
+  "description": "英語・日本語対応 高品質テキスト読み上げアプリケーション - maru-text-to-speech",
   "start_url": "/",
   "scope": "/",
   "display": "standalone",

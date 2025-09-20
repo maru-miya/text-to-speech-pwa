@@ -1,4 +1,4 @@
-// テキスト読み上げPWA メインアプリケーション
+// maru-text-to-speech メインアプリケーション
 class TextToSpeechApp {
   constructor() {
     this.synth = window.speechSynthesis;
@@ -731,5 +731,5 @@ document.addEventListener('DOMContentLoaded', () => {
   // アプリケーション開始
   window.ttsApp = new TextToSpeechApp();
 
-  console.log('Text-to-Speech PWA initialized successfully');
+  console.log('maru-text-to-speech initialized successfully');
 });

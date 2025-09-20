@@ -1,8 +1,8 @@
 // Service Worker for Text-to-Speech PWA
 // オフライン機能とキャッシュ管理を提供
 
-const CACHE_NAME = 'tts-pwa-v1.0.0';
-const STATIC_CACHE_NAME = 'tts-pwa-static-v1.0.0';
+const CACHE_NAME = 'maru-tts-v1.0.0';
+const STATIC_CACHE_NAME = 'maru-tts-static-v1.0.0';
 
 // キャッシュするリソース
 const STATIC_RESOURCES = [
@@ -207,7 +207,7 @@ self.addEventListener('push', (event) => {
   }
 
   const data = event.data.json();
-  const title = data.title || 'Text-to-Speech PWA';
+  const title = data.title || 'maru-text-to-speech';
   const options = {
     body: data.body || '新しい通知があります',
     icon: '/icons/icon-192.png',
