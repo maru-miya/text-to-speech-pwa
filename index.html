@@ -978,9 +978,6 @@
     <div class="container">
         <div class="header">
             <h1>Maru-Text-to-Speech</h1>
-            <button id="historyBtn" class="history-btn">
-                History
-            </button>
         </div>
         
         <textarea id="textInput" placeholder="読み上げたいテキストを入力してください..."></textarea>
@@ -1008,7 +1005,13 @@
             </div>
 
         </div>
-        
+
+        <div style="display: flex; justify-content: center; margin-bottom: 16px;">
+            <button id="historyBtn" class="history-btn">
+                History
+            </button>
+        </div>
+
         <div class="buttons">
             <div class="control-buttons">
                 <button id="skipBackBtn" class="skip-btn" title="15秒戻る">
@@ -1046,8 +1049,8 @@
         <!-- デバッグ表示（音声情報） -->
         <div id="voiceDebugInfo" class="voice-debug-info" style="display: none;">
             <small style="color: #666; font-size: 12px;">
-                🎤 音声: <span id="selectedVoiceName">未選択</span><br>
-                ⚡ 速度: <span id="currentSpeedDebug">1.0</span>
+                音声: <span id="selectedVoiceName">未選択</span><br>
+                速度: <span id="currentSpeedDebug">1.0</span>
             </small>
         </div>
 
@@ -1101,7 +1104,7 @@
                 <div class="history-modal-body">
                     <div id="historyList"></div>
                     <button id="clearAllHistoryBtn" class="clear-all-btn" style="display: none;">
-                        🗑️ すべて削除
+                        すべて削除
                     </button>
                 </div>
             </div>
@@ -1197,7 +1200,7 @@
             if (history.length === 0) {
                 historyList.innerHTML = `
                     <div class="history-empty">
-                        <p>📝 まだ履歴がありません</p>
+                        <p>まだ履歴がありません</p>
                         <p class="history-empty-sub">テキストを読み上げると履歴が表示されます</p>
                     </div>
                 `;
@@ -1228,14 +1231,14 @@
                         </div>
                         <div class="history-item-text">${truncatedText}</div>
                         <div class="history-item-params">
-                            ⚡ 速度: ${item.rate}
+                            速度: ${item.rate}
                         </div>
                         <div class="history-item-actions">
                             <button class="history-practice-btn" onclick="practiceHistoryItem(${index})">
-                                🎯 練習する
+                                練習する
                             </button>
                             <button class="history-delete-btn" onclick="deleteHistoryItem(${index})">
-                                🗑️ 削除
+                                削除
                             </button>
                         </div>
                     </div>
