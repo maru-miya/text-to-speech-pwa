@@ -412,6 +412,40 @@
             margin-bottom: 20px;
         }
 
+        /* スマホ向け配置の最適化 */
+        @media (max-width: 768px) {
+            .control-group {
+                margin-bottom: 24px;
+            }
+
+            /* 読み上げモード - 最上部での操作性向上 */
+            .control-group:first-of-type {
+                margin-top: 8px;
+                margin-bottom: 20px; /* モードボタンと再生ボタンの間隔を短縮 */
+            }
+
+            /* 再生ボタン - モードボタンの直下でタッチしやすく */
+            .buttons {
+                margin: 0 0 28px 0; /* 上部マージンを削除してモードボタンに近づける */
+            }
+
+            /* 速度設定 - 再生ボタンの下で調整しやすく */
+            .controls {
+                margin-bottom: 24px;
+            }
+
+            /* 履歴ボタン - 速度設定の下で見つけやすく */
+            .buttons + .controls + div {
+                margin-bottom: 20px;
+            }
+
+            /* 検出言語 - 最下部で邪魔にならない位置 */
+            .language-info {
+                margin-top: 16px;
+                margin-bottom: 8px;
+            }
+        }
+
         .control-label {
             font-weight: 500;
             color: #6b7280;
@@ -1021,42 +1055,20 @@
         
         <textarea id="textInput" placeholder="読み上げたいテキストを入力してください..."></textarea>
 
-        <div id="languageInfo" class="language-info" style="display: none;">
-            <span>検出言語:</span> <span id="detectedLanguage"></span>
+        <!-- 1. 読み上げモード（最上部） -->
+        <div class="control-group">
+            <label class="control-label">読み上げモード</label>
+            <div class="reading-mode-buttons">
+                <button class="mode-btn active" id="fromStartBtn" data-mode="start">
+                    📖 最初から読み上げ
+                </button>
+                <button class="mode-btn" id="fromCursorBtn" data-mode="cursor">
+                    📍 カーソル位置から読み上げ
+                </button>
+            </div>
         </div>
 
-        <div class="controls">
-            <select id="voiceSelect">
-                <option value="">音声を選択...</option>
-            </select>
-
-            <div class="control-group">
-                <label class="control-label">読み上げモード</label>
-                <div class="reading-mode-buttons">
-                    <button class="mode-btn active" id="fromStartBtn" data-mode="start">
-                        📖 最初から読み上げ
-                    </button>
-                    <button class="mode-btn" id="fromCursorBtn" data-mode="cursor">
-                        📍 カーソル位置から読み上げ
-                    </button>
-                </div>
-            </div>
-
-            <div class="control-group">
-                <label class="control-label">速度: <span id="rateValue">1.0</span>x</label>
-                <input type="range" id="rateRange" min="0.5" max="2" step="0.1" value="1">
-                <div class="preset-buttons">
-                    <button class="preset-btn" data-rate="0.75">0.75x</button>
-                    <button class="preset-btn active" data-rate="1.0">1.0x</button>
-                    <button class="preset-btn" data-rate="1.25">1.25x</button>
-                    <button class="preset-btn" data-rate="1.5">1.5x</button>
-                    <button class="preset-btn" data-rate="1.75">1.75x</button>
-                    <button class="preset-btn" data-rate="2.0">2.0x</button>
-                </div>
-            </div>
-
-        </div>
-
+        <!-- 2. 再生ボタン -->
         <div class="buttons">
             <div class="control-buttons">
                 <button id="skipBackBtn" class="skip-btn" title="15秒戻る">
@@ -1089,10 +1101,36 @@
             </div>
         </div>
 
+        <!-- 3. 速度設定 -->
+        <div class="controls">
+            <select id="voiceSelect">
+                <option value="">音声を選択...</option>
+            </select>
+
+            <div class="control-group">
+                <label class="control-label">速度: <span id="rateValue">1.0</span>x</label>
+                <input type="range" id="rateRange" min="0.5" max="2" step="0.1" value="1">
+                <div class="preset-buttons">
+                    <button class="preset-btn" data-rate="0.75">0.75x</button>
+                    <button class="preset-btn active" data-rate="1.0">1.0x</button>
+                    <button class="preset-btn" data-rate="1.25">1.25x</button>
+                    <button class="preset-btn" data-rate="1.5">1.5x</button>
+                    <button class="preset-btn" data-rate="1.75">1.75x</button>
+                    <button class="preset-btn" data-rate="2.0">2.0x</button>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. 履歴 -->
         <div style="display: flex; justify-content: center; margin-bottom: 16px;">
             <button id="historyBtn" class="history-btn">
                 History
             </button>
+        </div>
+
+        <!-- 5. 検出言語（最下部） -->
+        <div id="languageInfo" class="language-info" style="display: none;">
+            <span>検出言語:</span> <span id="detectedLanguage"></span>
         </div>
         
         <div id="status" class="status">準備完了</div>
